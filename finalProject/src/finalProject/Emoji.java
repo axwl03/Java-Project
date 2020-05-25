@@ -2,8 +2,8 @@ package finalProject;
 
 public class Emoji {
 	
-	private int x, y;
-	private Face type;
+	private int x, y;	// emoji's coordinate
+	private int type;	// emoji's type (ex: Face.LAUGH)
 	
 	public int getX() {
 		return x;
@@ -13,7 +13,7 @@ public class Emoji {
 		return y;
 	}
 	
-	public Face getType() {
+	public int getType() {
 		return type;
 	}
 	
@@ -22,7 +22,7 @@ public class Emoji {
 		this.y = y;
 	}
 	
-	public void setType(Face type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 	
