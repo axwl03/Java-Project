@@ -1,0 +1,168 @@
+
+import java.io.File;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+ 
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
+
+import java.awt.event.*;
+
+import java.util.*;
+
+public class ImageShow {  
+	private JFrame frame;  
+	private Mat mat = null;
+	private VideoCapture videoCapture;
+	private JLabel label;
+	private JLabel labelText;
+	private Timer captureTimer;
+	private Timer execTimer;
+	private CascadeClassifier faceDetector;
+	private Imgcodecs outDevice;
+	private BufferedReader inputBufferedReader;
+	private BufferedReader errBufferedReader;
+	private String resFromFer;
+	
+	public ImageShow() throws IOException { 
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        
+		//ScheduledExecutorService scheduledExecutorService;
+		VideoCapture videoCapture = new VideoCapture();
+		
+		videoCapture.open(0);
+	    videoCapture.set(Videoio.CAP_PROP_FRAME_WIDTH, 500);
+	    videoCapture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 500);
+	     
+	    faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
+			
+		frame = new JFrame();  
+		frame.setSize(800, 600);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
+		frame.getContentPane().setLayout(null);  
+		
+		label = new JLabel();
+		label.setLocation(50, 50);
+		label.setSize(500, 500);
+		label.setBackground(new Color(20, 20, 20));
+		frame.add(label);  
+		
+		labelText = new JLabel();
+		labelText.setLocation(600,200);
+		labelText.setSize(150,150);
+		frame.add(labelText); 
+
+		//String arg = new String("/Library/Frameworks/Python.framework/Versions/3.7/bin/python3 Fer.py");
+		
+		//Process p = Runtime.getRuntime().exec(arg);
+		//inputBufferedReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		//errBufferedReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		
+		captureTimer = new Timer();
+	    captureTimer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					Mat mat1 = new Mat();
+					videoCapture.read(mat1);
+					initialize(detectFace(mat1));
+					//Imgcodecs.imwrite("out.jpg", mat1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}, 500, 20);
+	    
+	    execTimer = new Timer();
+	    execTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					/*File f = new File("res.txt");
+					if(f.exists()) {
+						Scanner myReader = new Scanner(f);
+					    if(myReader.hasNext())
+					    	labelText.setText("result : " + myReader.next());
+					    myReader.close();
+					}*/
+					//labelText.setText("result : " + inputBufferedReader.readLine());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}  
+			}
+		}, 1000, 20);
+		
+		frame.setVisible(true);
+	}  
+	
+	private void initialize(Mat mat) {  
+		BufferedImage image = new MatToBufImg(mat, ".png").getImage();
+		label.setIcon(new ImageIcon(image));  
+	}  
+	
+	public Mat detectFace(Mat image) throws Exception
+    {
+        // 在图片中检测人脸
+        MatOfRect faceDetections = new MatOfRect();
+        faceDetector.detectMultiScale(image, faceDetections);
+        
+        //labelText.setText(String.format("Detected %s faces", faceDetections.toArray().length));
+        Rect[] rects = faceDetections.toArray();
+        
+        if(rects != null && rects.length > 0){
+        	for(int i = 0 ; i < rects.length; ++i) {
+            	Imgproc.rectangle(image, new Point(rects[i].x-2, rects[i].y-2),
+                        new Point(rects[i].x + rects[i].width, rects[i].y + rects[i].height),
+                        new Scalar(127, 189, 0), 1);
+            	
+            }
+        } 
+        return image;
+    }
+	
+	public JFrame getFrame() {
+		return frame;
+	}
+/** 
+* Initialize the contents of the frame. 
+*/  
+	
+}
