@@ -113,4 +113,8 @@ public class NetModule implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	private void handleData(String str) {
+		
+	}
 }
