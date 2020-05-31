@@ -1,4 +1,3 @@
-
 import java.io.File;
 
 import java.awt.Color;
@@ -85,12 +84,8 @@ public class ImageShow {
 		labelText.setLocation(600,200);
 		labelText.setSize(150,150);
 		frame.add(labelText); 
-
-		//String arg = new String("/Library/Frameworks/Python.framework/Versions/3.7/bin/python3 Fer.py");
 		
-		//Process p = Runtime.getRuntime().exec(arg);
-		//inputBufferedReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		//errBufferedReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		ImageSave imgProcess = new ImageSave();//跟 python(fer.py) 溝通 + jpg檔
 		
 		captureTimer = new Timer();
 	    captureTimer.schedule(new TimerTask(){
@@ -99,16 +94,19 @@ public class ImageShow {
 				// TODO Auto-generated method stub
 				try {
 					Mat mat1 = new Mat();
-					videoCapture.read(mat1);
-					initialize(detectFace(mat1));
-					//Imgcodecs.imwrite("out.jpg", mat1);
+					videoCapture.read(mat1); // get image from camera
+					if(imgProcess.getMessage().equals("ready")) { // exec if fer.py is ready
+						imgProcess.setMat(mat1); // save out.jpg and write "go" signal to fer.py
+						imgProcess.SetNone(); // reset msg to none to avoid exec multiple times
+					}
+					initialize(mat1); // set image to frame
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
 			}
-		}, 500, 20);
+		}, 500, 30);
 	    
 	    execTimer = new Timer();
 	    execTimer.schedule(new TimerTask() {
@@ -116,26 +114,18 @@ public class ImageShow {
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					/*File f = new File("res.txt");
-					if(f.exists()) {
-						Scanner myReader = new Scanner(f);
-					    if(myReader.hasNext())
-					    	labelText.setText("result : " + myReader.next());
-					    myReader.close();
-					}*/
-					//labelText.setText("result : " + inputBufferedReader.readLine());
+					labelText.setText(imgProcess.getResult()); // set detect result to lebel
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}  
 			}
-		}, 1000, 20);
+		}, 1000, 200);
 		
 		frame.setVisible(true);
 	}  
 	
 	private void initialize(Mat mat) {  
-		BufferedImage image = new MatToBufImg(mat, ".png").getImage();
-		label.setIcon(new ImageIcon(image));  
+		label.setIcon(new ImageIcon(new MatToBufImg(mat, ".jpg").getImage()));  
 	}  
 	
 	public Mat detectFace(Mat image) throws Exception
@@ -143,8 +133,7 @@ public class ImageShow {
         // 在图片中检测人脸
         MatOfRect faceDetections = new MatOfRect();
         faceDetector.detectMultiScale(image, faceDetections);
-        
-        //labelText.setText(String.format("Detected %s faces", faceDetections.toArray().length));
+
         Rect[] rects = faceDetections.toArray();
         
         if(rects != null && rects.length > 0){
@@ -161,8 +150,5 @@ public class ImageShow {
 	public JFrame getFrame() {
 		return frame;
 	}
-/** 
-* Initialize the contents of the frame. 
-*/  
 	
 }
