@@ -4,13 +4,23 @@ import java.net.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class NetModule implements Runnable {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	private OutputStream outputStream;
 	private InputStream inputStream;
+	private GameUI ui;
 	private boolean isServer;
+	
+	NetModule(GameUI ui){
+		this.ui = ui;
+	}
+	
+	public boolean isServer() {
+		return isServer;
+	}
 	
 	public void connect(String ipAddr) {
 		try {
@@ -61,7 +71,8 @@ public class NetModule implements Runnable {
 					inputStream.read(size);
 					byte[] strBytes = new byte[ByteBuffer.wrap(size).asIntBuffer().get()];
 					inputStream.read(strBytes);
-					System.out.println(new String(strBytes));
+					//System.out.println(new String(strBytes));
+					handleData(new String(strBytes));
 				}
 				else if(typeChar == 'e') {	// end connection
 					System.out.println("end");
@@ -115,6 +126,17 @@ public class NetModule implements Runnable {
 	}
 	
 	private void handleData(String str) {
-		
+		String[] data = str.split("\n");
+		ArrayList<Emoji> elist = new ArrayList<Emoji>();
+		if(data[0].equals("new")) {
+			for(int i = 1; i < data.length; ++i)
+				elist.add(Emoji.parseString(data[i]));
+			ui.setEmojiList(elist);
+		}
+		else if(data[0].equals("enemy")) {
+			for(int i = 1; i < data.length; ++i)
+				elist.add(Emoji.parseString(data[i]));
+			ui.setEnemyEmojiList(elist);
+		}
 	}
 }

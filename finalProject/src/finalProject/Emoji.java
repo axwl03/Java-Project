@@ -23,8 +23,11 @@ public class Emoji {
 		return type;
 	}
 	
-	public void setXY(int x, int y) {
+	public void setX(int x) {
 		this.x = x;
+	}
+	
+	public void setY(int y) {
 		this.y = y;
 	}
 	
@@ -33,7 +36,7 @@ public class Emoji {
 	}
 	
 	public String toString() {
-		return x + " " + y + " " + type + "\n";
+		return x + " " + y + " " + type;
 	}
 	
 	public static Emoji parseString(String str) {
