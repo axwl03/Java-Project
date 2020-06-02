@@ -4,11 +4,20 @@ public class Emoji {
 	
 	private int x, y;	// emoji's coordinate
 	private int type;	// emoji's type (ex: Face.LAUGH)
+	private String imagePath;
 	
 	Emoji(int x, int y, int type) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
+		if(type == Face.ANGRY)
+			imagePath = getClass().getResource("resources/angry.png").toExternalForm();
+		else if(type == Face.HAPPY)
+			imagePath = getClass().getResource("resources/happy.png").toExternalForm();
+		else if(type == Face.SAD)
+			imagePath = getClass().getResource("resources/sad.png").toExternalForm();
+		else if(type == Face.SURPRISE)
+			imagePath = getClass().getResource("resources/surprise.png").toExternalForm();
 	}
 	
 	public int getX() {
@@ -21,6 +30,10 @@ public class Emoji {
 	
 	public int getType() {
 		return type;
+	}
+	
+	public String getImagePath() {
+		return imagePath;
 	}
 	
 	public void setX(int x) {
