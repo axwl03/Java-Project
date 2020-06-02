@@ -78,8 +78,8 @@ public class ViewManager {
 
 			@Override
 			public void handle(ActionEvent event) {
-				if(true) {
-					GameViewManager gameManager = new GameViewManager();
+				if(chosenConnectingWay!=null) {
+					GameViewManager gameManager = new GameViewManager(chosenConnectingWay);
 					gameManager.createNewGame(mainStage);
 					pick.stop();
 				}

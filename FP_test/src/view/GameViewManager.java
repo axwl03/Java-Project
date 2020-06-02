@@ -2,6 +2,9 @@ package view;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,6 +14,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class GameViewManager {
@@ -38,9 +42,11 @@ public class GameViewManager {
 	private Random rand;
 	public NetModule net;
 	
+	private String character; 
 	
 	
-	public GameViewManager() {
+	public GameViewManager(String character) {
+		this.character = character;
 		myEmojiList = new ArrayList<Emoji>();
 		enemyEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();
@@ -61,9 +67,29 @@ public class GameViewManager {
 		this.menuStage = menuStage;
 		this.menuStage.hide();
 		createBackground();
+		createStartButton();
+		action();
+		//action();
 		//createGameElements();
 		//createGameLoop();
 		gameStage.show();
+	}
+	
+	private void createStartButton() {  
+		FDButton startButton = new FDButton("START");
+		startButton.setPrefWidth(100);
+		startButton.setPrefHeight(30);
+		startButton.setFont(Font.loadFont(getClass().getResource("resources/kenvector_future.ttf").toExternalForm(), 12));
+		startButton.setLayoutX(500);
+		startButton.setLayoutY(100);
+		gamePane.getChildren().add(startButton);
+
+		startButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// all the game logic write here~
+			}
+		});
 	}
 	
 	public void setResult(int type) {
@@ -72,7 +98,7 @@ public class GameViewManager {
 	
 	// generate new emoji and send all existed emojis to client
 	public void action() {
-		if(net.isServer()) {	// server side code
+		if(character.equals("server")) {	// server side code
 			// delete matched emoji
 			int i = 0;
 			while(i < myEmojiList.size()) {
@@ -123,7 +149,7 @@ public class GameViewManager {
 				str = str + myEmojiList.get(i).toString() + "\n";
 			net.send(str);
 		}
-		else {
+		else if(character.equals("client")){
 			// delete matched emoji
 			int i = 0;
 			while(i < myEmojiList.size()) {
