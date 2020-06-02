@@ -1,3 +1,5 @@
+package finalProject;
+
 import java.io.File;
 
 import java.awt.Color;
