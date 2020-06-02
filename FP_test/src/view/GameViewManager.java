@@ -1,8 +1,10 @@
 package view;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -61,6 +63,7 @@ public class GameViewManager {
 		gameScene = new Scene(gamePane, GAME_WIDTH, GAME_HEIGHT);
 		gameStage = new Stage();
 		gameStage.setScene(gameScene);
+		gameStage.setTitle("FACE DANCE CHALLENGE");
 	}
 	
 	public void createNewGame(Stage menuStage) {
@@ -219,8 +222,12 @@ public class GameViewManager {
 		gamePane.getChildren().add(emojiImage);
 	}
 	
-	public void setImage() {
-		
+	public void setImage(BufferedImage capture) {
+		Image image = SwingFXUtils.toFXImage(capture, null);
+		ImageView camera = new ImageView(image);
+		camera.setLayoutX(100);
+		camera.setLayoutY(150);
+		gamePane.getChildren().add(camera);
 	}
 	
 	public void printEmoji() {
@@ -237,15 +244,6 @@ public class GameViewManager {
 			System.out.println(enemyEmojiList.get(i).toString());
 		}
 	}
-	
-	
-	/*
-	private void setEmoji()
-	{
-		ImageView logo = new ImageView(getClass().getResource("").toString());
-		logo.setLayoutX(320);
-		logo.setLayoutY(50);
-	}*/
 	
 	private void createBackground() {
 		Image backgroundImage = new Image(getClass().getResource("resources/game_background.jpg").toString(), 1024, 768, false, true);
