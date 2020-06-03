@@ -3,6 +3,7 @@ package view;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Date;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -19,7 +20,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class GameViewManager {
+public class GameViewManager implements Runnable {
 	// game parameters
 	private static final int GAME_WIDTH = 1024;
 	private static final int GAME_HEIGHT = 768;
@@ -31,6 +32,8 @@ public class GameViewManager {
 	public static final int enemyOffsetX = 50;
 	public static final int enemyOffsetY = 50;
 	public static final int maxEmojiGen = 5;
+	public static final long duration = 60000;	// milliseconds
+	public static final int delay = 500;	// milliseconds
 	
 	private AnchorPane gamePane;
 	private Scene gameScene;
@@ -44,19 +47,27 @@ public class GameViewManager {
 	private Random rand;
 	public NetModule net;
 	
-	private String character; 
-	private String server_IP;
-	
+	private long startTime;
+	private Date date;
+	private boolean isServer;
+	private String ipAddr;
+	public boolean inGame;
 	
 	public GameViewManager(String character, String server_IP) {
-		this.character = character;
-		this.server_IP = server_IP;
+		date = new Date();
+		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
 		enemyEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();
 		net = new NetModule(this);
 		rand = new Random();
 		initializeStage();
+		if(character.equals("server"))
+			this.isServer = true;
+		else if(character.equals("client")) {
+			ipAddr = server_IP;
+			this.isServer = false;
+		}
 		//createKeyListeners();
 	}
 	
@@ -72,12 +83,14 @@ public class GameViewManager {
 		this.menuStage = menuStage;
 		this.menuStage.hide();
 		createBackground();
-		createStartButton();
-		action();
-		//action();
 		//createGameElements();
 		//createGameLoop();
 		gameStage.show();
+		Thread actioner = new Thread(this);
+		if(isServer) {
+			createStartButton();
+		}
+		actioner.start();
 	}
 	
 	private void createStartButton() {  
@@ -92,7 +105,7 @@ public class GameViewManager {
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// all the game logic write here~
+				inGame = true;
 			}
 		});
 	}
@@ -101,9 +114,51 @@ public class GameViewManager {
 		matchedEmoji = type;
 	}
 	
+	public void run() {
+		if(isServer) {
+			net.listen(8000);
+			while(!inGame) {
+				try {
+					Thread.sleep(delay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			startTime = date.getTime();
+			while(date.getTime() - startTime < duration) {
+				action();
+				try {
+					Thread.sleep(delay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			net.endGame();
+		}
+		else {
+			net.connect(ipAddr, 8000);
+			while(!inGame) {
+				try {
+					Thread.sleep(delay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			startTime = date.getTime();
+			while(inGame) {
+				action();
+				try {
+					Thread.sleep(delay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	// generate new emoji and send all existed emojis to client
 	public void action() {
-		if(character.equals("server")) {	// server side code
+		if(net.isServer()) {	// server side code
 			// delete matched emoji
 			int i = 0;
 			while(i < myEmojiList.size()) {
@@ -154,7 +209,7 @@ public class GameViewManager {
 				str = str + myEmojiList.get(i).toString() + "\n";
 			net.send(str);
 		}
-		else if(character.equals("client")){
+		else {
 			// delete matched emoji
 			int i = 0;
 			while(i < myEmojiList.size()) {

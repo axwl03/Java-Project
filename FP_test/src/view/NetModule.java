@@ -45,10 +45,10 @@ public class NetModule implements Runnable {
 		return ip;
 	}
 	
-	public void connect(String ipAddr) {
+	public void connect(String ipAddr, int port) {
 		try {
 			isServer = false;
-			clientSocket = new Socket(ipAddr, 8000);
+			clientSocket = new Socket(ipAddr, port);
 			System.out.println("Connected");
 			Thread listener = new Thread(this);
 			listener.start();
@@ -139,6 +139,15 @@ public class NetModule implements Runnable {
 		}
 	}
 	
+	public void startGame() {
+		send("start\n");
+	}
+	
+	public void endGame() {
+		send("end\n");
+		ui.inGame = false;
+	}
+	
 	public void end() {
 		try {
 			outputStream.write(ByteBuffer.allocate(Character.BYTES).putChar('e').array());
@@ -160,6 +169,12 @@ public class NetModule implements Runnable {
 			for(int i = 1; i < data.length; ++i)
 				elist.add(Emoji.parseString(data[i]));
 			ui.setEnemyEmojiList(elist);
+		}
+		else if(data[0].equals("start")) {
+			ui.inGame = true;
+		}
+		else if(data[0].equals("end")) {
+			ui.inGame = false;
 		}
 	}
 }
