@@ -45,10 +45,12 @@ public class GameViewManager {
 	public NetModule net;
 	
 	private String character; 
+	private String server_IP;
 	
 	
-	public GameViewManager(String character) {
+	public GameViewManager(String character, String server_IP) {
 		this.character = character;
+		this.server_IP = server_IP;
 		myEmojiList = new ArrayList<Emoji>();
 		enemyEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();

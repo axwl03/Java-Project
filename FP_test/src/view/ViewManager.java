@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
@@ -53,12 +54,12 @@ public class ViewManager {
 		createLogo();
 		createButtons();
 		createSubScenes();
-		pick.play();
+		//pick.play();
 	}
 
 	private void createButtons() {
 		createPlayButton();
-		createConnectButton();
+		//createConnectButton();
 		createCreditsButton();
 		createExitButton();
 	}
@@ -73,7 +74,7 @@ public class ViewManager {
 	private void createPlayButton() {
 		FDButton playButton = new FDButton("PLAY");
 		addMenuButton(playButton);
-		
+		/*
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -84,18 +85,14 @@ public class ViewManager {
 					pick.stop();
 				}
 			}
-		});
-	}
-	
-	private void createConnectButton() {
-		FDButton connectButton = new FDButton("CONNECT");
-		addMenuButton(connectButton);
-		connectButton.setOnAction(new EventHandler<ActionEvent>() {
+		});*/
+		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
 				showSubScene(connectSubScene);
 			}
 		});
+		
 	}
 	
 	private void createCreditsButton() {  //authors
@@ -156,8 +153,14 @@ public class ViewManager {
 				for(ConnectingChoice choice: choices) {
 					choice.setIsCircleChoosen(false);
 				}
-				chosenConnectingWay = "server";
 				choice1.setIsCircleChoosen(true);
+				Label ip = new Label();
+				ip.setText(NetModule.getLocalAddress());
+				ip.setLayoutX(243);
+				ip.setLayoutY(143);
+				connectSubScene.getPane().getChildren().add(ip);
+				chosenConnectingWay = "server";
+				IP_address = NetModule.getLocalAddress();
 			}
 		});
 		
@@ -170,8 +173,23 @@ public class ViewManager {
 				for(ConnectingChoice choice: choices) {
 					choice.setIsCircleChoosen(false);
 				}
-				chosenConnectingWay = "client";
 				choice2.setIsCircleChoosen(true);
+				chosenConnectingWay = "client";
+				TextField field = new TextField("");
+				field.setPromptText("Enter Server's IP address");
+				field.setLayoutX(243);
+				field.setLayoutY(163);
+				connectSubScene.getPane().getChildren().add(field);
+				field.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent e) {
+						if(e.getCode() == KeyCode.ENTER) //press enter if complete input
+						{
+							IP_address = field.getText();
+							System.out.println(IP_address);
+						}		
+					}
+				});
 			}
 		});
 			
@@ -188,32 +206,10 @@ public class ViewManager {
 		OKButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(chosenConnectingWay.equals("server")) {
-					//do server thing
-					connectSubScene.moveSubScene();
-					sceneToHide = null;
-				}
-				else if(chosenConnectingWay.equals("client")) {
-					TextField field = new TextField("");
-					field.setPromptText("Enter Server's IP address");
-					field.setLayoutX(243);
-					field.setLayoutY(163);
-					connectSubScene.getPane().getChildren().add(field);
-					field.setOnKeyPressed(new EventHandler<KeyEvent>() {
-						@Override
-						public void handle(KeyEvent e) {
-							if(e.getCode() == KeyCode.ENTER) //press enter if complete input
-							{
-								IP_address = field.getText();
-								System.out.println(IP_address);
-								
-								//do client thing
-								
-								connectSubScene.moveSubScene();
-								sceneToHide = null;
-							}		
-						}
-					});
+				if(chosenConnectingWay!=null){
+					GameViewManager gameManager = new GameViewManager(chosenConnectingWay, IP_address);
+					gameManager.createNewGame(mainStage);
+					pick.stop();
 				}
 			}
 		});

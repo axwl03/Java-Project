@@ -33,7 +33,7 @@ public class NetModule implements Runnable {
 		return isServer;
 	}
 	
-	public static String getLocalAddress() {
+	public static String getLocalAddress() { //server call
 		String ip = null;
 		try (final DatagramSocket socket = new DatagramSocket()){
 			socket.connect(InetAddress.getByName("8.8.8.8"), 8000);
