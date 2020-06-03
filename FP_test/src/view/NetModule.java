@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -29,6 +31,18 @@ public class NetModule implements Runnable {
 	
 	public boolean isServer() {
 		return isServer;
+	}
+	
+	public String getLocalAddress() {
+		String ip = null;
+		try (final DatagramSocket socket = new DatagramSocket()){
+			socket.connect(InetAddress.getByName("8.8.8.8"), 8000);
+			ip = socket.getLocalAddress().getHostAddress();
+			socket.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ip;
 	}
 	
 	public void connect(String ipAddr) {
