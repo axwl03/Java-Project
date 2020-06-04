@@ -166,8 +166,11 @@ public class NetModule implements Runnable {
 			ui.setEmojiList(elist);
 		}
 		else if(data[0].equals("enemy")) {
-			for(int i = 1; i < data.length; ++i)
+			for(int i = 1; i < data.length; ++i) {
 				elist.add(Emoji.parseString(data[i]));
+				elist.get(elist.size()-1).setX(elist.get(elist.size()-1).getX()-GameViewManager.myOffsetX+GameViewManager.enemyOffsetX);
+				elist.get(elist.size()-1).setY(elist.get(elist.size()-1).getY()-GameViewManager.myOffsetY+GameViewManager.enemyOffsetY);
+			}	
 			ui.setEnemyEmojiList(elist);
 		}
 		else if(data[0].equals("start")) {

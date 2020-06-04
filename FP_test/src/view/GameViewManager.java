@@ -34,6 +34,7 @@ public class GameViewManager implements Runnable {
 	public static final int maxEmojiGen = 5;
 	public static final long duration = 60000;	// milliseconds
 	public static final int delay = 500;	// milliseconds
+	public static final int imageDelay = 500;	// milliseconds
 	
 	private AnchorPane gamePane;
 	private Scene gameScene;
@@ -91,6 +92,26 @@ public class GameViewManager implements Runnable {
 			createStartButton();
 		}
 		actioner.start();
+		
+		// display emoji
+		while(!inGame) {
+			try {
+				Thread.sleep(delay);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		while(inGame) {
+			for(int i = 0; i < myEmojiList.size(); ++i)
+				setEmoji(myEmojiList.get(i));
+			for(int i = 0; i < enemyEmojiList.size(); ++i)
+				setEmoji(enemyEmojiList.get(i));
+			try {
+				Thread.sleep(imageDelay);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void createStartButton() {  
@@ -133,6 +154,7 @@ public class GameViewManager implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			inGame = false;
 			net.endGame();
 		}
 		else {
@@ -191,13 +213,11 @@ public class GameViewManager implements Runnable {
 			
 			// PROBABLY NEED ANOTHER THREAD
 			// display emoji on screen
-			for(i = 0; i < myEmojiList.size(); ++i)
+			/*for(i = 0; i < myEmojiList.size(); ++i)
 				setEmoji(myEmojiList.get(i));
 			for(i = 0; i < enemyEmojiList.size(); ++i) {
-				enemyEmojiList.get(i).setX(enemyEmojiList.get(i).getX()-myOffsetX+enemyOffsetX);
-				enemyEmojiList.get(i).setY(enemyEmojiList.get(i).getY()-myOffsetY+enemyOffsetY);
 				setEmoji(enemyEmojiList.get(i));
-			}
+			}*/
 			
 			// send exist emojiList and myEmojiList
 			String str = "new\n";
@@ -240,13 +260,11 @@ public class GameViewManager implements Runnable {
 			}
 			
 			// display emoji on screen
-			for(i = 0; i < myEmojiList.size(); ++i)
+			/*for(i = 0; i < myEmojiList.size(); ++i)
 				setEmoji(myEmojiList.get(i));
 			for(i = 0; i < enemyEmojiList.size(); ++i) {
-				enemyEmojiList.get(i).setX(enemyEmojiList.get(i).getX()-myOffsetX+enemyOffsetX);
-				enemyEmojiList.get(i).setY(enemyEmojiList.get(i).getY()-myOffsetY+enemyOffsetY);
 				setEmoji(enemyEmojiList.get(i));
-			}
+			}*/
 			
 			// send myEmojiList to server
 			String str = "enemy\n";
