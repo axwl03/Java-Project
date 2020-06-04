@@ -94,10 +94,7 @@ public class GameViewManager implements Runnable {
 	}
 	
 	private void createStartButton() {  
-		FDButton startButton = new FDButton("START");
-		startButton.setPrefWidth(100);
-		startButton.setPrefHeight(30);
-		startButton.setFont(Font.loadFont(getClass().getResource("resources/kenvector_future.ttf").toExternalForm(), 12));
+		GameView_FDButton startButton = new GameView_FDButton("START");
 		startButton.setLayoutX(500);
 		startButton.setLayoutY(100);
 		gamePane.getChildren().add(startButton);
