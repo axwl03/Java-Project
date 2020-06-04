@@ -3,6 +3,10 @@ package view;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TimerTask;
+
+import java.util.Timer;
+
 import java.util.Date;
 
 import javafx.embed.swing.SwingFXUtils;
@@ -19,22 +23,24 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.animation.AnimationTimer;
 
 public class GameViewManager implements Runnable {
 	// game parameters
 	private static final int GAME_WIDTH = 1024;
 	private static final int GAME_HEIGHT = 768;
 	public static final int shift = 5;
-	public static final int maxX = 100;
-	public static final int maxY = 100;
+	public static final int maxX = 500;
+	public static final int maxY = 600;
 	public static final int myOffsetX = 10;
 	public static final int myOffsetY = 10;
-	public static final int enemyOffsetX = 50;
+	public static final int enemyOffsetX = 700;
 	public static final int enemyOffsetY = 50;
-	public static final int maxEmojiGen = 5;
+	public static final int maxEmojiGen = 1;
 	public static final long duration = 60000;	// milliseconds
 	public static final int delay = 500;	// milliseconds
 	public static final int imageDelay = 500;	// milliseconds
+	public static volatile boolean renderSignal;
 	
 	private AnchorPane gamePane;
 	private Scene gameScene;
@@ -52,11 +58,12 @@ public class GameViewManager implements Runnable {
 	private Date date;
 	private boolean isServer;
 	private String ipAddr;
-	public boolean inGame;
+	public volatile boolean inGame;
 	
 	public GameViewManager(String character, String server_IP) {
 		date = new Date();
 		inGame = false;
+		renderSignal = false;
 		myEmojiList = new ArrayList<Emoji>();
 		enemyEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();
@@ -92,26 +99,33 @@ public class GameViewManager implements Runnable {
 			createStartButton();
 		}
 		actioner.start();
+		setEmoji(new Emoji(300, 300, Face.ANGRY));
 		
 		// display emoji
-		while(!inGame) {
-			try {
-				Thread.sleep(delay);
-			} catch (Exception e) {
-				e.printStackTrace();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if(inGame) {
+					if(renderSignal)
+						renderSignal = false;
+					else renderSignal = true;
+					printEmoji();
+				}
 			}
-		}
-		while(inGame) {
-			for(int i = 0; i < myEmojiList.size(); ++i)
-				setEmoji(myEmojiList.get(i));
-			for(int i = 0; i < enemyEmojiList.size(); ++i)
-				setEmoji(enemyEmojiList.get(i));
-			try {
-				Thread.sleep(imageDelay);
-			} catch (Exception e) {
-				e.printStackTrace();
+		}, 0, imageDelay);
+		AnimationTimer animationTimer = new AnimationTimer() {
+			@Override
+			public void handle(long arg0) {
+				if(renderSignal) {
+					for(int i = 0; i < myEmojiList.size(); ++i)
+						setEmoji(myEmojiList.get(i));
+					for(int i = 0; i < enemyEmojiList.size(); ++i)
+						setEmoji(enemyEmojiList.get(i));
+				}
 			}
-		}
+		};
+		animationTimer.start();	
 	}
 	
 	private void createStartButton() {  
@@ -135,43 +149,34 @@ public class GameViewManager implements Runnable {
 	public void run() {
 		if(isServer) {
 			net.listen(8000);
-			while(!inGame) {
-				try {
-					Thread.sleep(delay);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			System.out.println("not inGame");
+			while(!inGame) {}
+			System.out.println("inGame");
 			startTime = date.getTime();
-			while(date.getTime() - startTime < duration) {
-				action();
-				try {
-					Thread.sleep(delay);
-				} catch (Exception e) {
-					e.printStackTrace();
+			net.startGame();
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					if(date.getTime() - startTime < duration) {
+						action();
+					}
 				}
-			}
-			inGame = false;
-			net.endGame();
+			}, 0, delay);
 		}
 		else {
 			net.connect(ipAddr, 8000);
-			while(!inGame) {
-				try {
-					Thread.sleep(delay);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			while(!inGame) {}
 			startTime = date.getTime();
-			while(inGame) {
-				action();
-				try {
-					Thread.sleep(delay);
-				} catch (Exception e) {
-					e.printStackTrace();
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					if(inGame) {
+						action();
+					}
 				}
-			}
+			}, 0, delay);
 		}
 	}
 	
@@ -207,14 +212,6 @@ public class GameViewManager implements Runnable {
 				myEmojiList.get(mySize - 1).setX(myEmojiList.get(mySize - 1).getX() + myOffsetX);
 				myEmojiList.get(mySize - 1).setY(myEmojiList.get(mySize - 1).getY() + myOffsetY);
 			}
-			
-			// PROBABLY NEED ANOTHER THREAD
-			// display emoji on screen
-			/*for(i = 0; i < myEmojiList.size(); ++i)
-				setEmoji(myEmojiList.get(i));
-			for(i = 0; i < enemyEmojiList.size(); ++i) {
-				setEmoji(enemyEmojiList.get(i));
-			}*/
 			
 			// send exist emojiList and myEmojiList
 			String str = "new\n";
@@ -255,13 +252,6 @@ public class GameViewManager implements Runnable {
 				myEmojiList.get(mySize - 1).setX(myEmojiList.get(mySize - 1).getX() + myOffsetX);
 				myEmojiList.get(mySize - 1).setY(myEmojiList.get(mySize - 1).getY() + myOffsetY);
 			}
-			
-			// display emoji on screen
-			/*for(i = 0; i < myEmojiList.size(); ++i)
-				setEmoji(myEmojiList.get(i));
-			for(i = 0; i < enemyEmojiList.size(); ++i) {
-				setEmoji(enemyEmojiList.get(i));
-			}*/
 			
 			// send myEmojiList to server
 			String str = "enemy\n";
