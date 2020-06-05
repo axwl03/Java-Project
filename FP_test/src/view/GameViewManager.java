@@ -29,7 +29,7 @@ public class GameViewManager implements Runnable {
 	// game parameters
 	private static final int GAME_WIDTH = 1024;
 	private static final int GAME_HEIGHT = 768;
-	public static final int shift = 5;
+	public static final int shift = 2;
 	public static final int maxX = 500;
 	public static final int maxY = 600;
 	public static final int myOffsetX = 10;
@@ -39,7 +39,6 @@ public class GameViewManager implements Runnable {
 	public static final int maxEmojiGen = 1;
 	public static final long duration = 60000;	// milliseconds
 	public static final int delay = 500;	// milliseconds
-	public static final int imageDelay = 500;	// milliseconds
 	public static volatile boolean renderSignal;
 	
 	private AnchorPane gamePane;
@@ -76,7 +75,6 @@ public class GameViewManager implements Runnable {
 			ipAddr = server_IP;
 			this.isServer = false;
 		}
-		//createKeyListeners();
 	}
 	
 	private void initializeStage() {
@@ -91,38 +89,37 @@ public class GameViewManager implements Runnable {
 		this.menuStage = menuStage;
 		this.menuStage.hide();
 		createBackground();
-		//createGameElements();
-		//createGameLoop();
 		gameStage.show();
 		Thread actioner = new Thread(this);
 		if(isServer) {
 			createStartButton();
 		}
 		actioner.start();
-		setEmoji(new Emoji(300, 300, Face.ANGRY));
-		
+
 		// display emoji
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(inGame) {
-					if(renderSignal)
-						renderSignal = false;
-					else renderSignal = true;
+				if(inGame) 
 					printEmoji();
-				}
 			}
-		}, 0, imageDelay);
+		}, 0, 200);
 		AnimationTimer animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
-				if(renderSignal) {
 					for(int i = 0; i < myEmojiList.size(); ++i)
+					{
 						setEmoji(myEmojiList.get(i));
+						if(EmojiIsOutOfBound(myEmojiList.get(i)))
+							myEmojiList.remove(i);
+					}
 					for(int i = 0; i < enemyEmojiList.size(); ++i)
+					{
 						setEmoji(enemyEmojiList.get(i));
-				}
+						if(EmojiIsOutOfBound(enemyEmojiList.get(i)))
+							enemyEmojiList.remove(i);
+					}
 			}
 		};
 		animationTimer.start();	
@@ -185,24 +182,14 @@ public class GameViewManager implements Runnable {
 		if(net.isServer()) {	// server side code
 			// delete matched emoji
 			int i = 0;
+			/*
 			while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getType() == matchedEmoji) {
 					myEmojiList.remove(i);
 					continue;
 				}
 				i++;
-			}
-			
-			// move emoji downward and remove emoji if it exceeds boundary
-			i = 0;
-			while(i < myEmojiList.size()) {
-				myEmojiList.get(i).setY(myEmojiList.get(i).getY() + shift);
-				if(myEmojiList.get(i).getY() > maxY + myOffsetY) {
-					myEmojiList.remove(i);
-					continue;
-				}
-				i++;
-			}
+			}*/
 			
 			// random generate emoji to emojiList and append to myEmojiList
 			randomEmojiGen();
@@ -226,24 +213,14 @@ public class GameViewManager implements Runnable {
 		else {
 			// delete matched emoji
 			int i = 0;
+			/*
 			while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getType() == matchedEmoji) {
 					myEmojiList.remove(i);
 					continue;
 				}
 				i++;
-			}
-
-			// move emoji downward and remove emoji if it exceeds boundary
-			i = 0;
-			while(i < myEmojiList.size()) {
-				myEmojiList.get(i).setY(myEmojiList.get(i).getY() + shift);
-				if(myEmojiList.get(i).getY() > maxY + myOffsetY) {
-					myEmojiList.remove(i);
-					continue;
-				}
-				i++;
-			}
+			}*/
 			
 			// append emojiList to myEmojiList
 			for(i = 0; i < emojiList.size(); ++i) {
@@ -277,11 +254,28 @@ public class GameViewManager implements Runnable {
 		emojiList = elist;
 	}
 	
-	public void setEmoji(Emoji e) {
-		ImageView emojiImage= new ImageView(new Image(e.getImagePath(), 30, 30, false, true));
-		emojiImage.setLayoutX(e.getX());
-		emojiImage.setLayoutY(e.getY());
-		gamePane.getChildren().add(emojiImage);
+	private void setEmoji(Emoji e) { //add emoji to pane and move emoji
+		if(e.getIsNew())
+		{
+			e.getEmojiImage().setLayoutX(e.getX());
+			e.getEmojiImage().setLayoutY(e.getY());
+			gamePane.getChildren().add(e.getEmojiImage());
+			e.setIsNew(false);
+		}
+		else {
+			e.setY(e.getY() + shift);
+			e.getEmojiImage().setLayoutY(e.getY());
+		}
+	}
+	
+	private boolean EmojiIsOutOfBound(Emoji e)
+	{
+		if(e.getY() > maxY + myOffsetY)
+		{
+			gamePane.getChildren().remove(e.getEmojiImage());
+			return true;
+		}
+		else return false;
 	}
 	
 	public void setImage(BufferedImage capture) {

@@ -1,24 +1,43 @@
 package view;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 public class Emoji {
 	
 	private int x, y;	// emoji's coordinate
 	private int type;	// emoji's type (ex: Face.LAUGH)
-	private String imagePath;
+	//private String imagePath;
+	private boolean isNew; 
+	private ImageView emojiImage;
 	
 	Emoji(int x, int y, int type) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
 		if(type == Face.ANGRY)
-			imagePath = getClass().getResource("resources/angry.png").toExternalForm();
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/angry.png").toExternalForm() , 30, 30, false, true));
 		else if(type == Face.HAPPY)
-			imagePath = getClass().getResource("resources/happy.png").toExternalForm();
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/happy.png").toExternalForm() , 30, 30, false, true));
 		else if(type == Face.SAD)
-			imagePath = getClass().getResource("resources/sad.png").toExternalForm();
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/sad.png").toExternalForm() , 30, 30, false, true));
 		else if(type == Face.SURPRISE)
-			imagePath = getClass().getResource("resources/surprise.png").toExternalForm();
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/surprise.png").toExternalForm() , 30, 30, false, true));
+		isNew = true;
 	}
+	
+	public ImageView getEmojiImage() {
+		return emojiImage;
+	}
+	
+	public boolean getIsNew() {
+		return isNew;
+	}
+	
+	public void setIsNew(boolean isNew) {
+		this.isNew = isNew;
+	}
+	
 	
 	public int getX() {
 		return x;
@@ -30,10 +49,6 @@ public class Emoji {
 	
 	public int getType() {
 		return type;
-	}
-	
-	public String getImagePath() {
-		return imagePath;
 	}
 	
 	public void setX(int x) {
