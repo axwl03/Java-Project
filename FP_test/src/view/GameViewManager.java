@@ -49,6 +49,8 @@ public class GameViewManager implements Runnable {
 	private int matchedEmoji;	// store matched result
 	private Random rand;
 	public NetModule net;
+	private BufferedImage faceImage;
+	private ImageView camera;
 	
 	private long startTime;
 	private Date date;
@@ -104,6 +106,10 @@ public class GameViewManager implements Runnable {
 		AnimationTimer animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
+				if(camera != null) {
+					gamePane.getChildren().remove(camera);
+				}
+				renderImage();
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
@@ -119,7 +125,6 @@ public class GameViewManager implements Runnable {
 		startButton.setLayoutX(500);
 		startButton.setLayoutY(100);
 		gamePane.getChildren().add(startButton);
-
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -171,13 +176,6 @@ public class GameViewManager implements Runnable {
 		if(net.isServer()) {	// server side code
 			// delete matched emoji
 			int i = 0;
-			/*while(i < myEmojiList.size()) {
-				if(myEmojiList.get(i).getType() == matchedEmoji) {
-					myEmojiList.remove(i);
-					continue;
-				}
-				i++;
-			}*/
 			
 			// remove emoji if it exceeds boundary + 20
 			i = 0;
@@ -207,13 +205,6 @@ public class GameViewManager implements Runnable {
 		else {
 			// delete matched emoji
 			int i = 0;
-			/*while(i < myEmojiList.size()) {
-				if(myEmojiList.get(i).getType() == matchedEmoji) {
-					myEmojiList.remove(i);
-					continue;
-				}
-				i++;
-			}*/
 			
 			// remove emoji if it exceeds boundary + 20
 			i = 0;
@@ -276,8 +267,18 @@ public class GameViewManager implements Runnable {
 	}
 	
 	public void setImage(BufferedImage capture) {
-		Image image = SwingFXUtils.toFXImage(capture, null);
+		faceImage = capture;
+	}
+	
+	// display faceImage on screen
+	private void renderImage() {
+		/*Image image = SwingFXUtils.toFXImage(capture, null);
 		ImageView camera = new ImageView(image);
+		camera.setLayoutX(100);
+		camera.setLayoutY(150);
+		gamePane.getChildren().add(camera);*/
+		Image image = SwingFXUtils.toFXImage(faceImage, null);
+		camera = new ImageView(image);
 		camera.setLayoutX(100);
 		camera.setLayoutY(150);
 		gamePane.getChildren().add(camera);
