@@ -107,7 +107,7 @@ public class GameViewManager implements Runnable {
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
-					EmojiIsOutOfBound(myEmojiList.get(i));
+					emojiOut(myEmojiList.get(i));
 				}
 			}
 		};
@@ -171,13 +171,13 @@ public class GameViewManager implements Runnable {
 		if(net.isServer()) {	// server side code
 			// delete matched emoji
 			int i = 0;
-			while(i < myEmojiList.size()) {
+			/*while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getType() == matchedEmoji) {
 					myEmojiList.remove(i);
 					continue;
 				}
 				i++;
-			}
+			}*/
 			
 			// remove emoji if it exceeds boundary + 20
 			i = 0;
@@ -207,13 +207,13 @@ public class GameViewManager implements Runnable {
 		else {
 			// delete matched emoji
 			int i = 0;
-			while(i < myEmojiList.size()) {
+			/*while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getType() == matchedEmoji) {
 					myEmojiList.remove(i);
 					continue;
 				}
 				i++;
-			}
+			}*/
 			
 			// remove emoji if it exceeds boundary + 20
 			i = 0;
@@ -264,9 +264,9 @@ public class GameViewManager implements Runnable {
 		}
 	}
 	
-	private boolean EmojiIsOutOfBound(Emoji e)
+	private boolean emojiOut(Emoji e)
 	{
-		if(e.getStatus() == 1 && e.getY() > maxY + myOffsetY)
+		if(e.getStatus() == 1 && (e.getY() > maxY + myOffsetY || e.getType() == matchedEmoji))
 		{
 			gamePane.getChildren().remove(e.getEmojiImage());
 			e.setStatus(2);
