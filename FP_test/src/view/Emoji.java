@@ -8,7 +8,7 @@ public class Emoji {
 	private int x, y;	// emoji's coordinate
 	private int type;	// emoji's type (ex: Face.LAUGH)
 	//private String imagePath;
-	private boolean isNew; 
+	private int status; // 0: new, 1: exist, 2: out
 	private ImageView emojiImage;
 	
 	Emoji(int x, int y, int type) {
@@ -23,19 +23,19 @@ public class Emoji {
 			emojiImage = new ImageView(new Image(getClass().getResource("resources/sad.png").toExternalForm() , 30, 30, false, true));
 		else if(type == Face.SURPRISE)
 			emojiImage = new ImageView(new Image(getClass().getResource("resources/surprise.png").toExternalForm() , 30, 30, false, true));
-		isNew = true;
+		status = 0;
 	}
 	
 	public ImageView getEmojiImage() {
 		return emojiImage;
 	}
 	
-	public boolean getIsNew() {
-		return isNew;
+	public int getStatus() {
+		return status;
 	}
 	
-	public void setIsNew(boolean isNew) {
-		this.isNew = isNew;
+	public void setStatus(int status) {
+		this.status = status;
 	}
 	
 	
