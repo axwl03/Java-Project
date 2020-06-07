@@ -224,16 +224,11 @@ public class GameViewManager implements Runnable {
 				}
 				i++;
 			}
-			
-			// append emojiList to myEmojiList
-			for(i = 0; i < emojiList.size(); ++i) {
-				Emoji newEmoji = new Emoji(emojiList.get(i).getX(), emojiList.get(i).getY(), emojiList.get(i).getType());
-				newEmoji.setX(newEmoji.getX() + myOffsetX);
-				newEmoji.setY(newEmoji.getY() + myOffsetY);
-				myEmojiList.add(newEmoji);
-			}
-			emojiList.clear();
 		}
+	}
+	
+	public void myEmojiAdd(Emoji e) {
+		myEmojiList.add(e);
 	}
 	
 	private void randomEmojiGen() {
