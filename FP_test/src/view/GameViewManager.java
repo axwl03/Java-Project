@@ -37,10 +37,8 @@ public class GameViewManager implements Runnable {
 	public static final int shift = 2;
 	public static final int maxX = 500;
 	public static final int maxY = 600;
-	public static final int myOffsetX = 10;
+	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
-	public static final int enemyOffsetX = 700;
-	public static final int enemyOffsetY = 50;
 	public static final int maxEmojiGen = 1;
 	public static final long duration = 60000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
@@ -151,7 +149,7 @@ public class GameViewManager implements Runnable {
 	
 	public void run() {
 		if(isServer) {
-			net.listen(8000);
+			net.listen(8080);
 			System.out.println("not inGame");
 			while(!inGame) {}
 			System.out.println("inGame");
@@ -168,7 +166,8 @@ public class GameViewManager implements Runnable {
 			}, 0, delay);
 		}
 		else {
-			net.connect(ipAddr, 8000);
+			System.out.println(ipAddr);
+			net.connect(ipAddr, 8080);
 			while(!inGame) {}
 			startTime = date.getTime();
 			Timer timer = new Timer();
@@ -235,6 +234,7 @@ public class GameViewManager implements Runnable {
 	}
 	
 	private void randomEmojiGen() {
+		System.out.println("in random");
 		emojiList.clear();
 		int num = maxEmojiGen; //rand.nextInt(maxEmojiGen+1)
 		if(myEmojiList.size() > 5)

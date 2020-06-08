@@ -49,7 +49,6 @@ public class ViewManager {
 		try {
 			imageShow = new ImageShow();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		menuButtons = new ArrayList<>();
