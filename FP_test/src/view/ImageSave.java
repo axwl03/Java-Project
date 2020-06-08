@@ -1,5 +1,7 @@
 package view;
 import java.lang.*;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.io.*;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -14,30 +16,38 @@ public class ImageSave {
 	private String arg;
 	private String result;
 	
-	
 	public ImageSave() {
 		result = "loading...";
 		msg = "none";
 		
-		// fer.py 啟動 要先找到執行檔位置 終端機輸入 whilch python3 > /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
-		arg = new String("/Library/Frameworks/Python.framework/Versions/3.7/bin/python3 Fer.py");
+		// fer.py ���� 閬���銵��蔭 蝯垢璈撓� whilch python3 > /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
+		System.out.println(System.getProperty("user.dir"));
+		arg = new String("python Fer.py");
 		
 		try {
-			/** 以下方法來自
+			/** 隞乩�瘜�
 			 * https://stackoverflow.com/questions/4112470/java-how-to-both-read-and-write-to-from-process-thru-pipe-stdin-stdout
 			 */
 			p = Runtime.getRuntime().exec(arg);
-			result = "loading cnn model...";
+			//result = "loading cnn model...";
 			in = new BufferedReader(new InputStreamReader(p.getInputStream())); // get input from fer.py
 			out  = new BufferedWriter(new OutputStreamWriter(p.getOutputStream())); // set output to fer.py
 			new Thread() {
 				public void run() {
 					while(true){
 						try {
+							//System.out.println("test1");
+							//out.write("hello\n");
+							//out.flush();
+							//System.out.println("test2");
+							//while((msg=in.readLine())==null);
 							msg = in.readLine(); // get output (not busy waiting)
+							//System.out.println("test3");
+							
 							if(!msg.equals("ready"))
 								result = msg;
 							System.out.println(result);
+							//System.out.println(in.readLine());
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -45,6 +55,10 @@ public class ImageSave {
 				};
 				
 			}.start();
+		
+		    
+		    
+		    
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
