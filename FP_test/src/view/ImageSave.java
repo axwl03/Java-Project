@@ -22,7 +22,7 @@ public class ImageSave {
 		
 		// fer.py  whilch python3 > /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
 		System.out.println(System.getProperty("user.dir"));
-		arg = new String("/Library/Frameworks/Python.framework/Versions/3.7/bin/python3 Fer.py");
+		arg = new String("python Fer.py");
 		
 		try {
 			/** 隞乩�瘜�

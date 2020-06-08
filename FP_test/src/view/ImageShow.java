@@ -8,6 +8,8 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -59,6 +61,7 @@ public class ImageShow {
 	private BufferedReader errBufferedReader;
 	private String resFromFer;
 	private GameViewManager gameViewManager;
+	public BufferedImage faceImage;
 	
 	public ImageShow() throws IOException { 
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -67,7 +70,7 @@ public class ImageShow {
 		VideoCapture videoCapture = new VideoCapture();
 		
 		videoCapture.open(0);
-	    videoCapture.set(Videoio.CAP_PROP_FRAME_WIDTH, 500);
+	    videoCapture.set(Videoio.CAP_PROP_FRAME_WIDTH, 400);
 	    videoCapture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 500);
 	     
 	    faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
@@ -90,7 +93,7 @@ public class ImageShow {
 		frame.add(labelText); 
 		*/
 		
-		ImageSave imgProcess = new ImageSave();//跟 python(fer.py) 溝通 + jpg檔
+		ImageSave imgProcess = new ImageSave();//頝� python(fer.py) 皞�� + jpg瑼�
 		
 		captureTimer = new Timer();
 	    captureTimer.schedule(new TimerTask(){
@@ -105,7 +108,7 @@ public class ImageShow {
 						imgProcess.SetNone(); // reset msg to none to avoid exec multiple times
 					}
 					if(gameViewManager != null) {
-						gameViewManager.setImage(new MatToBufImg(mat, ".jpg").getImage());
+						gameViewManager.setImage(new MatToBufImg(mat1, ".jpg").getImage());
 					}
 					
 					//initialize(mat1); // set image to frame
@@ -127,7 +130,7 @@ public class ImageShow {
 					if(gameViewManager != null) {
 						if(imgProcess.getResult().equals("happy")) 
 							gameViewManager.setResult(Face.HAPPY);
-						else if(imgProcess.getResult().equals("serprise")) 
+						else if(imgProcess.getResult().equals("surprise")) 
 							gameViewManager.setResult(Face.SURPRISE);
 						else if(imgProcess.getResult().equals("sad")) 
 							gameViewManager.setResult(Face.SAD);
@@ -156,7 +159,7 @@ public class ImageShow {
 	
 	public Mat detectFace(Mat image) throws Exception
     {
-        // 在图片中检测人脸
+        // ����葉璉�瘚犖�
         MatOfRect faceDetections = new MatOfRect();
         faceDetector.detectMultiScale(image, faceDetections);
 

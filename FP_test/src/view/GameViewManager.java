@@ -1,9 +1,15 @@
 package view;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TimerTask;
+
+import javax.imageio.ImageIO;
 
 import java.util.Timer;
 
@@ -57,10 +63,12 @@ public class GameViewManager implements Runnable {
 	private boolean isServer;
 	private String ipAddr;
 	public volatile boolean inGame;
+	private boolean isLegal;
 	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 5;
 		date = new Date();
+		isLegal = true;
 		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();
@@ -103,13 +111,17 @@ public class GameViewManager implements Runnable {
 					printEmoji();
 			}
 		}, 0, delay);
+		
+		
 		AnimationTimer animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
 				if(camera != null) {
 					gamePane.getChildren().remove(camera);
 				}
+				isLegal = false;
 				renderImage();
+				isLegal = true;
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
@@ -117,7 +129,7 @@ public class GameViewManager implements Runnable {
 				}
 			}
 		};
-		animationTimer.start();	
+		animationTimer.start();
 	}
 	
 	private void createStartButton() {  
@@ -267,7 +279,8 @@ public class GameViewManager implements Runnable {
 	}
 	
 	public void setImage(BufferedImage capture) {
-		faceImage = capture;
+		if(isLegal)
+			faceImage = capture;
 	}
 	
 	// display faceImage on screen
@@ -279,6 +292,8 @@ public class GameViewManager implements Runnable {
 		gamePane.getChildren().add(camera);*/
 		Image image = SwingFXUtils.toFXImage(faceImage, null);
 		camera = new ImageView(image);
+		camera.setFitHeight(500);
+		camera.setFitWidth(400);
 		camera.setLayoutX(100);
 		camera.setLayoutY(150);
 		gamePane.getChildren().add(camera);
