@@ -21,5 +21,6 @@ while True:
             sys.stdout.flush()
         #print(emotion)
     except:
-        emotion = 'no face'
+        sys.exit()
+        sys.stdout.write('end\n')
     

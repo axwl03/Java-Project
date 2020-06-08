@@ -46,8 +46,7 @@ import java.awt.event.*;
 import java.util.*;
 
 public class ImageShow {  
-	//private JFrame frame;  
-	private Mat mat = null;
+	//private JFrame frame; 
 	private VideoCapture videoCapture;
 	//private JLabel label;
 	//private JLabel labelText;
@@ -105,7 +104,7 @@ public class ImageShow {
 						imgProcess.SetNone(); // reset msg to none to avoid exec multiple times
 					}
 					if(gameViewManager != null) {
-						gameViewManager.setImage(new MatToBufImg(mat, ".jpg").getImage());
+						gameViewManager.setImage(new MatToBufImg(mat1, ".jpg").getImage());
 					}
 					
 					//initialize(mat1); // set image to frame
@@ -127,7 +126,7 @@ public class ImageShow {
 					if(gameViewManager != null) {
 						if(imgProcess.getResult().equals("happy")) 
 							gameViewManager.setResult(Face.HAPPY);
-						else if(imgProcess.getResult().equals("serprise")) 
+						else if(imgProcess.getResult().equals("surprise")) 
 							gameViewManager.setResult(Face.SURPRISE);
 						else if(imgProcess.getResult().equals("sad")) 
 							gameViewManager.setResult(Face.SAD);
