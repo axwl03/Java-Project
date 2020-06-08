@@ -46,11 +46,11 @@ import java.awt.event.*;
 import java.util.*;
 
 public class ImageShow {  
-	private JFrame frame;  
+	//private JFrame frame;  
 	private Mat mat = null;
 	private VideoCapture videoCapture;
-	private JLabel label;
-	private JLabel labelText;
+	//private JLabel label;
+	//private JLabel labelText;
 	private Timer captureTimer;
 	private Timer execTimer;
 	private CascadeClassifier faceDetector;
@@ -58,6 +58,7 @@ public class ImageShow {
 	private BufferedReader inputBufferedReader;
 	private BufferedReader errBufferedReader;
 	private String resFromFer;
+	private GameViewManager gameViewManager;
 	
 	public ImageShow() throws IOException { 
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -71,6 +72,7 @@ public class ImageShow {
 	     
 	    faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
 			
+	    /*
 		frame = new JFrame();  
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
@@ -86,6 +88,7 @@ public class ImageShow {
 		labelText.setLocation(600,200);
 		labelText.setSize(150,150);
 		frame.add(labelText); 
+		*/
 		
 		ImageSave imgProcess = new ImageSave();//跟 python(fer.py) 溝通 + jpg檔
 		
@@ -101,7 +104,11 @@ public class ImageShow {
 						imgProcess.setMat(mat1); // save out.jpg and write "go" signal to fer.py
 						imgProcess.SetNone(); // reset msg to none to avoid exec multiple times
 					}
-					initialize(mat1); // set image to frame
+					if(gameViewManager != null) {
+						gameViewManager.setImage(new MatToBufImg(mat, ".jpg").getImage());
+					}
+					
+					//initialize(mat1); // set image to frame
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -116,18 +123,35 @@ public class ImageShow {
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					labelText.setText(imgProcess.getResult()); // set detect result to lebel
+					//labelText.setText(imgProcess.getResult()); // set detect result to lebel
+					if(gameViewManager != null) {
+						if(imgProcess.getResult().equals("happy")) 
+							gameViewManager.setResult(Face.HAPPY);
+						else if(imgProcess.getResult().equals("serprise")) 
+							gameViewManager.setResult(Face.SURPRISE);
+						else if(imgProcess.getResult().equals("sad")) 
+							gameViewManager.setResult(Face.SAD);
+						else if(imgProcess.getResult().equals("angry")) 
+							gameViewManager.setResult(Face.ANGRY);
+						else
+							gameViewManager.setResult(Face.NONE);
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}  
 			}
 		}, 1000, 200);
 		
-		frame.setVisible(true);
+		//frame.setVisible(true);
 	}  
 	
+	public void getGameViewManager(GameViewManager g) {
+		gameViewManager = g;
+	}
+	
+	/*
 	private void initialize(Mat mat) {  
-		label.setIcon(new ImageIcon(new MatToBufImg(mat, ".jpg").getImage()));  
+		//label.setIcon(new ImageIcon(new MatToBufImg(mat, ".jpg").getImage()));  
 	}  
 	
 	public Mat detectFace(Mat image) throws Exception
@@ -143,7 +167,6 @@ public class ImageShow {
             	Imgproc.rectangle(image, new Point(rects[i].x-2, rects[i].y-2),
                         new Point(rects[i].x + rects[i].width, rects[i].y + rects[i].height),
                         new Scalar(127, 189, 0), 1);
-            	
             }
         } 
         return image;
@@ -152,5 +175,5 @@ public class ImageShow {
 	public JFrame getFrame() {
 		return frame;
 	}
-	
+	*/
 }

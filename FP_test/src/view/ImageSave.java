@@ -20,9 +20,9 @@ public class ImageSave {
 		result = "loading...";
 		msg = "none";
 		
-		// fer.py ���� 閬���銵��蔭 蝯垢璈撓� whilch python3 > /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
+		// fer.py  whilch python3 > /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
 		System.out.println(System.getProperty("user.dir"));
-		arg = new String("python Fer.py");
+		arg = new String("/Library/Frameworks/Python.framework/Versions/3.7/bin/python3 Fer.py");
 		
 		try {
 			/** 隞乩�瘜�
