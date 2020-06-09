@@ -37,7 +37,7 @@ public class ViewManager {
 	private FaceDanceSubScene connectSubScene;
 	private FaceDanceSubScene creditsSubScene;
 	private FaceDanceSubScene sceneToHide;
-	private ImageShow imageShow;
+	//private ImageShow imageShow;
 	
 	ArrayList<FDButton> menuButtons;
 	ArrayList<ConnectingChoice> choices;
@@ -46,11 +46,11 @@ public class ViewManager {
 	private String IP_address;
 	
 	public ViewManager() {
-		try {
+		/*try {
 			imageShow = new ImageShow();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		menuButtons = new ArrayList<>();
 		mainPane = new AnchorPane();
 		mainScene = new Scene(mainPane, WIDTH, HEIGHT);
@@ -215,7 +215,7 @@ public class ViewManager {
 			public void handle(ActionEvent event) {
 				if(chosenConnectingWay!=null){
 					GameViewManager gameManager = new GameViewManager(chosenConnectingWay, IP_address);
-					imageShow.getGameViewManager(gameManager);
+					//imageShow.getGameViewManager(gameManager);
 					gameManager.createNewGame(mainStage);
 					pick.stop();
 				}

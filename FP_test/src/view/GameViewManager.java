@@ -40,7 +40,7 @@ public class GameViewManager implements Runnable {
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
 	public static final int maxEmojiGen = 1;
-	public static final long duration = 60000;	// milliseconds
+	public static final long duration = 5000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -57,7 +57,6 @@ public class GameViewManager implements Runnable {
 	private ImageView camera;
 	
 	private long startTime;
-	private Date date;
 	private boolean isServer;
 	private String ipAddr;
 	public volatile boolean inGame;
@@ -65,7 +64,6 @@ public class GameViewManager implements Runnable {
 	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 5;
-		date = new Date();
 		isLegal = true;
 		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
@@ -101,25 +99,25 @@ public class GameViewManager implements Runnable {
 		actioner.start();
 
 		// display emoji
-		Timer timer = new Timer();
+		/*Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				if(inGame) 
 					printEmoji();
 			}
-		}, 0, delay);
+		}, 0, delay);*/
 		
 		
 		AnimationTimer animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
-				if(camera != null) {
+				/*if(camera != null) {
 					gamePane.getChildren().remove(camera);
 				}
 				isLegal = false;
 				renderImage();
-				isLegal = true;
+				isLegal = true;*/
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
@@ -153,23 +151,22 @@ public class GameViewManager implements Runnable {
 			System.out.println("not inGame");
 			while(!inGame) {}
 			System.out.println("inGame");
-			startTime = date.getTime();
+			startTime = System.currentTimeMillis();
 			net.startGame();
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					if(date.getTime() - startTime < duration) {
+					if(System.currentTimeMillis() - startTime < duration) {
 						action();
 					}
 				}
 			}, 0, delay);
 		}
 		else {
-			System.out.println(ipAddr);
 			net.connect(ipAddr, 8080);
 			while(!inGame) {}
-			startTime = date.getTime();
+			startTime = System.currentTimeMillis();
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {
 				@Override
@@ -185,11 +182,8 @@ public class GameViewManager implements Runnable {
 	// generate new emoji and send all existed emojis to client
 	public void action() {
 		if(net.isServer()) {	// server side code
-			// delete matched emoji
-			int i = 0;
-			
 			// remove emoji if it exceeds boundary + 20
-			i = 0;
+			int i = 0;
 			while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getY() > maxY + myOffsetY + 20) {
 					myEmojiList.remove(i);
@@ -214,11 +208,8 @@ public class GameViewManager implements Runnable {
 			net.send(str);
 		}
 		else {
-			// delete matched emoji
-			int i = 0;
-			
 			// remove emoji if it exceeds boundary + 20
-			i = 0;
+			int i = 0;
 			while(i < myEmojiList.size()) {
 				if(myEmojiList.get(i).getY() > maxY + myOffsetY + 20) {
 					myEmojiList.remove(i);
@@ -234,7 +225,6 @@ public class GameViewManager implements Runnable {
 	}
 	
 	private void randomEmojiGen() {
-		System.out.println("in random");
 		emojiList.clear();
 		int num = maxEmojiGen; //rand.nextInt(maxEmojiGen+1)
 		if(myEmojiList.size() > 5)
@@ -285,11 +275,6 @@ public class GameViewManager implements Runnable {
 	
 	// display faceImage on screen
 	private void renderImage() {
-		/*Image image = SwingFXUtils.toFXImage(capture, null);
-		ImageView camera = new ImageView(image);
-		camera.setLayoutX(100);
-		camera.setLayoutY(150);
-		gamePane.getChildren().add(camera);*/
 		Image image = SwingFXUtils.toFXImage(faceImage, null);
 		camera = new ImageView(image);
 		camera.setFitHeight(500);
