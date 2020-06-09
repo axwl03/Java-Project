@@ -98,7 +98,6 @@ public class NetModule implements Runnable {
 					handleData(new String(strBytes));
 				}
 				else if(typeChar == 'e') {	// end connection
-					System.out.println("end");
 					break;
 				}
 			}
@@ -168,6 +167,9 @@ public class NetModule implements Runnable {
 		}
 		else if(data[0].equals("end")) {
 			ui.inGame = false;
+		}
+		else if(data[0].equals("score")) {
+			ui.setEnemyScore(Integer.parseInt(data[1]));
 		}
 	}
 }

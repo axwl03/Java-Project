@@ -40,7 +40,7 @@ public class GameViewManager implements Runnable {
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
 	public static final int maxEmojiGen = 1;
-	public static final long duration = 5000;	// milliseconds
+	public static final long duration = 30000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -63,15 +63,19 @@ public class GameViewManager implements Runnable {
 	private boolean isLegal;
 	
 	public AnimationTimer animationTimer;
+	private int score;
+	private int enemyScore;
 	
 	public GameViewManager(String character, String server_IP) {
-		matchedEmoji = 5;
+		matchedEmoji = 1;
 		isLegal = true;
 		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
 		emojiList = new ArrayList<Emoji>();
 		net = new NetModule(this);
 		rand = new Random();
+		score = 0;
+		enemyScore = 0;
 		initializeStage();
 		if(character.equals("server"))
 			this.isServer = true;
@@ -165,14 +169,20 @@ public class GameViewManager implements Runnable {
 					else {
 						// stop timer
 						this.cancel();
-						animationTimer.stop();
-						System.out.println("end");
-						
-						// score
-						
-						// end connection
+						// send final score
 						net.endGame();
+						String str = "score\n" + Integer.toString(score) + "\n";
+						net.send(str);
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						// stop rendering
+						animationTimer.stop();
+						// end connection
 						net.end();
+						System.out.println("final score: " + score + " " + enemyScore);
 					}
 				}
 			}, 0, delay);
@@ -191,10 +201,17 @@ public class GameViewManager implements Runnable {
 					else {
 						// stop timer
 						this.cancel();
+						// send final score
+						String str = "score\n" + Integer.toString(score) + "\n";
+						net.send(str);
+						try {
+							Thread.sleep(350);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						// stop rendering
 						animationTimer.stop();
-						
-						// score
-						
+						System.out.println("final score: " + score + " " + enemyScore);
 					}
 				}
 			}, 0, delay);
@@ -228,6 +245,9 @@ public class GameViewManager implements Runnable {
 			for(i = 0; i < emojiList.size(); ++i)
 				str = str + emojiList.get(i).toString() + "\n";
 			net.send(str);
+			// send score to enemy
+			str = "score\n" + Integer.toString(score) + "\n";
+			net.send(str);
 		}
 		else {
 			// remove emoji if it exceeds boundary + 20
@@ -239,6 +259,9 @@ public class GameViewManager implements Runnable {
 				}
 				i++;
 			}
+			// send score to enemy
+			String str = "score\n" + Integer.toString(score) + "\n";
+			net.send(str);
 		}
 	}
 	
@@ -283,6 +306,7 @@ public class GameViewManager implements Runnable {
 	{
 		if(e.getStatus() == 1 && (e.getY() > maxY + myOffsetY || e.getType() == matchedEmoji))
 		{
+			if(e.getType() == matchedEmoji) score += 10;
 			gamePane.getChildren().remove(e.getEmojiImage());
 			e.setStatus(2);
 			return true;
@@ -293,6 +317,10 @@ public class GameViewManager implements Runnable {
 	public void setImage(BufferedImage capture) {
 		if(isLegal)
 			faceImage = capture;
+	}
+	
+	public void setEnemyScore(int score) {
+		this.enemyScore = score;
 	}
 	
 	// display faceImage on screen
