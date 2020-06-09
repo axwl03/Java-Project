@@ -62,6 +62,8 @@ public class GameViewManager implements Runnable {
 	public volatile boolean inGame;
 	private boolean isLegal;
 	
+	public AnimationTimer animationTimer;
+	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 5;
 		isLegal = true;
@@ -109,7 +111,7 @@ public class GameViewManager implements Runnable {
 		}, 0, delay);*/
 		
 		
-		AnimationTimer animationTimer = new AnimationTimer() {
+		animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
 				/*if(camera != null) {
@@ -160,6 +162,18 @@ public class GameViewManager implements Runnable {
 					if(System.currentTimeMillis() - startTime < duration) {
 						action();
 					}
+					else {
+						// stop timer
+						this.cancel();
+						animationTimer.stop();
+						System.out.println("end");
+						
+						// score
+						
+						// end connection
+						net.endGame();
+						net.end();
+					}
 				}
 			}, 0, delay);
 		}
@@ -173,6 +187,14 @@ public class GameViewManager implements Runnable {
 				public void run() {
 					if(inGame) {
 						action();
+					}
+					else {
+						// stop timer
+						this.cancel();
+						animationTimer.stop();
+						
+						// score
+						
 					}
 				}
 			}, 0, delay);
