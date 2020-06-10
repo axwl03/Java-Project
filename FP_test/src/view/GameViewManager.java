@@ -16,6 +16,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 
@@ -36,7 +37,7 @@ public class GameViewManager implements Runnable {
 	public static final int countdownX = 412;
 	public static final int countdownY = 30;
 	public static final int countdownOffset = 90;
-	public static final long duration = 10000;	// milliseconds
+	public static final long duration = 30000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -79,9 +80,12 @@ public class GameViewManager implements Runnable {
 	private boolean win;
 	private boolean lose;
 	private boolean tie;
+	private boolean connect;
+	AudioClip gameMusic = new AudioClip(getClass().getResource("resources/gameMusic.mp3").toString());
 	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 1;
+		connect = false;
 		isLegal = true;
 		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
@@ -174,8 +178,8 @@ public class GameViewManager implements Runnable {
 				}
 				if(tie) {
 					ImageView tieImage = new ImageView(new Image(getClass().getResource("resources/tie.png").toExternalForm(), 400, 100, false, true));
-					tieImage.setLayoutX(600);
-					tieImage.setLayoutY(400);
+					tieImage.setLayoutX(520);
+					tieImage.setLayoutY(300);
 					gamePane.getChildren().add(tieImage);
 					lose = false;
 				}
@@ -189,13 +193,15 @@ public class GameViewManager implements Runnable {
 	private void createStartButton() {  
 		GameView_FDButton startButton = new GameView_FDButton("START");
 		startButton.setLayoutX(440);
-		startButton.setLayoutY(175);
+		startButton.setLayoutY(145);
 		gamePane.getChildren().add(startButton);
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				inGame = true;
-				gamePane.getChildren().remove(startButton);
+				gameMusic.play();
+				if(connect)
+					gamePane.getChildren().remove(startButton);
 			}
 		});
 	}
@@ -265,6 +271,7 @@ public class GameViewManager implements Runnable {
 	public void run() {
 		if(isServer) {
 			net.listen(8080);
+			connect = true;
 			System.out.println("not inGame");
 			while(!inGame) {}
 			System.out.println("inGame");
@@ -280,6 +287,8 @@ public class GameViewManager implements Runnable {
 					else {
 						// stop timer
 						this.cancel();
+						// stop gameMusic
+						gameMusic.stop();
 						// send final score
 						net.endGame();
 						String str = "score\n" + Integer.toString(myScore) + "\n";
@@ -393,7 +402,7 @@ public class GameViewManager implements Runnable {
 	private void randomEmojiGen() {
 		emojiList.clear();
 		int num = maxEmojiGen; //rand.nextInt(maxEmojiGen+1)
-		if(myEmojiList.size() > 5)
+		if(myEmojiList.size() > 8)
 			return;
 		ArrayList<Emoji> elist = new ArrayList<Emoji>();
 		for(int i = 0; i < num; ++i)
@@ -448,10 +457,10 @@ public class GameViewManager implements Runnable {
 	private void renderImage() {
 		Image image = SwingFXUtils.toFXImage(faceImage, null);
 		camera = new ImageView(image);
-		camera.setFitHeight(500);
-		camera.setFitWidth(400);
-		camera.setLayoutX(100);
-		camera.setLayoutY(200);
+		camera.setFitHeight(500); //500
+		camera.setFitWidth(500); //500
+		camera.setLayoutX(20); //20
+		camera.setLayoutY(200); //200
 		gamePane.getChildren().add(camera);
 	}
 	

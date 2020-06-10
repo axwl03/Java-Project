@@ -70,7 +70,7 @@ public class ImageShow {
 		VideoCapture videoCapture = new VideoCapture();
 		
 		videoCapture.open(0);
-	    videoCapture.set(Videoio.CAP_PROP_FRAME_WIDTH, 400);
+	    videoCapture.set(Videoio.CAP_PROP_FRAME_WIDTH, 500);
 	    videoCapture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 500);
 	     
 	    faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
@@ -93,7 +93,7 @@ public class ImageShow {
 		frame.add(labelText); 
 		*/
 		
-		ImageSave imgProcess = new ImageSave();//頝� python(fer.py) 皞�� + jpg瑼�
+		ImageSave imgProcess = new ImageSave();//��蕭 python(fer.py) ���蕭嚙� + jpg�嚙�
 		
 		captureTimer = new Timer();
 	    captureTimer.schedule(new TimerTask(){
@@ -159,7 +159,7 @@ public class ImageShow {
 	
 	public Mat detectFace(Mat image) throws Exception
     {
-        // ����葉璉�瘚犖�
+        // 嚙踐祗嚙踐郎嚙踝蕭����蕭����蕭�
         MatOfRect faceDetections = new MatOfRect();
         faceDetector.detectMultiScale(image, faceDetections);
 
