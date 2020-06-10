@@ -40,7 +40,7 @@ public class GameViewManager implements Runnable {
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
 	public static final int maxEmojiGen = 1;
-	public static final long duration = 5000;	// milliseconds
+	public static final long duration = 60000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -55,6 +55,15 @@ public class GameViewManager implements Runnable {
 	public NetModule net;
 	private BufferedImage faceImage;
 	private ImageView camera;
+	
+	private ImageView tensDigitImage;
+	private ImageView unitDigitImage;
+	private TimerDisplay timerTens = new TimerDisplay();
+	private TimerDisplay timerUnit = new TimerDisplay();
+	private int timerTensState = 0;
+	private int timerUnitState = 0;
+	private long lastUnitDigit = 0;
+	private long lastTensDigit = 0;
 	
 	private long startTime;
 	private boolean isServer;
@@ -120,6 +129,7 @@ public class GameViewManager implements Runnable {
 				isLegal = false;
 				renderImage();
 				isLegal = true;*/
+				countDown();
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
@@ -129,6 +139,7 @@ public class GameViewManager implements Runnable {
 		};
 		animationTimer.start();
 	}
+	
 	
 	private void createStartButton() {  
 		GameView_FDButton startButton = new GameView_FDButton("START");
@@ -143,6 +154,61 @@ public class GameViewManager implements Runnable {
 		});
 	}
 	
+	public void countDown() {
+		//System.out.println(System.currentTimeMillis() - startTime);
+		
+		long remainTime = (duration - (System.currentTimeMillis() - startTime))/1000;
+		if(remainTime>=0) {
+			//System.out.println(remainTime);
+		
+		long unitDigit = remainTime%10;
+		long tensDigit = remainTime/10;
+		if(tensDigit == 6) { //tensDigit has changed
+			timerTensState = 0;
+			timerUnitState = 0;
+			lastTensDigit = tensDigit;
+		}
+		else if((tensDigit != lastTensDigit) && (tensDigit != 6)) {
+			gamePane.getChildren().remove(tensDigitImage);
+			timerTensState = 0;
+			lastTensDigit = tensDigit;
+		}
+		if(unitDigit != lastUnitDigit) {
+			gamePane.getChildren().remove(unitDigitImage);
+			timerUnitState = 0;
+			lastUnitDigit = unitDigit;
+		}
+		setTensDigit(tensDigit);
+		setUnitDigit(unitDigit);
+		}
+		//System.out.println(tensDigit + "+" + unitDigit);
+		//TimerDisplay timerTest = new TimerDisplay();
+		//timerTest.getNumber().setLayoutX(750);
+		//timerTest.getNumber().setLayoutY(70);
+		//gamePane.getChildren().add(timerTest.getNumberZero());
+	}
+	public void setTensDigit(long digit) {
+		//System.out.println(digit);
+		tensDigitImage = timerTens.getNumberImage(digit);
+		if(timerTensState == 0) {
+			tensDigitImage.setLayoutX(750);
+			tensDigitImage.setLayoutY(70);
+			gamePane.getChildren().add(tensDigitImage);
+			timerTensState = 1;
+		}
+		
+	}
+	public void setUnitDigit(long digit) {
+		//System.out.println(digit);
+		unitDigitImage = timerUnit.getNumberImage(digit);
+		if(timerUnitState == 0) {
+			unitDigitImage.setLayoutX(840);
+			unitDigitImage.setLayoutY(70);
+			gamePane.getChildren().add(unitDigitImage);
+			timerUnitState = 1;
+		}
+		
+	}
 	public void setResult(int type) {
 		matchedEmoji = type;
 	}
