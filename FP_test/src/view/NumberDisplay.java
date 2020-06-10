@@ -30,17 +30,29 @@ public class NumberDisplay {
 			eightImage = new ImageView(new Image(getClass().getResource("resources/8.png").toExternalForm(), 100, 150, false, true));
 			nineImage = new ImageView(new Image(getClass().getResource("resources/9.png").toExternalForm(), 100, 150, false, true));
 		}
+		else if(mode == 1) {
+			zeroImage = new ImageView(new Image(getClass().getResource("resources/score0.png").toExternalForm(), 70, 105, false, true));
+			oneImage = new ImageView(new Image(getClass().getResource("resources/score1.png").toExternalForm(), 70, 105, false, true));
+			twoImage = new ImageView(new Image(getClass().getResource("resources/score2.png").toExternalForm(), 70, 105, false, true));
+			threeImage = new ImageView(new Image(getClass().getResource("resources/score3.png").toExternalForm(), 70, 105, false, true));
+			fourImage = new ImageView(new Image(getClass().getResource("resources/score4.png").toExternalForm(), 70, 105, false, true));
+			fiveImage = new ImageView(new Image(getClass().getResource("resources/score5.png").toExternalForm(), 70, 105, false, true));
+			sixImage = new ImageView(new Image(getClass().getResource("resources/score6.png").toExternalForm(), 70, 105, false, true));
+			sevenImage = new ImageView(new Image(getClass().getResource("resources/score7.png").toExternalForm(), 70, 105, false, true));
+			eightImage = new ImageView(new Image(getClass().getResource("resources/score8.png").toExternalForm(), 70, 105, false, true));
+			nineImage = new ImageView(new Image(getClass().getResource("resources/score9.png").toExternalForm(), 70, 105, false, true));
+		}
 		else {
-			zeroImage = new ImageView(new Image(getClass().getResource("resources/score0.png").toExternalForm(), 100, 150, false, true));
-			oneImage = new ImageView(new Image(getClass().getResource("resources/score1.png").toExternalForm(), 100, 150, false, true));
-			twoImage = new ImageView(new Image(getClass().getResource("resources/score2.png").toExternalForm(), 100, 150, false, true));
-			threeImage = new ImageView(new Image(getClass().getResource("resources/score3.png").toExternalForm(), 100, 150, false, true));
-			fourImage = new ImageView(new Image(getClass().getResource("resources/score4.png").toExternalForm(), 100, 150, false, true));
-			fiveImage = new ImageView(new Image(getClass().getResource("resources/score5.png").toExternalForm(), 100, 150, false, true));
-			sixImage = new ImageView(new Image(getClass().getResource("resources/score6.png").toExternalForm(), 100, 150, false, true));
-			sevenImage = new ImageView(new Image(getClass().getResource("resources/score7.png").toExternalForm(), 100, 150, false, true));
-			eightImage = new ImageView(new Image(getClass().getResource("resources/score8.png").toExternalForm(), 100, 150, false, true));
-			nineImage = new ImageView(new Image(getClass().getResource("resources/score9.png").toExternalForm(), 100, 150, false, true));
+			zeroImage = new ImageView(new Image(getClass().getResource("resources/eScore0.png").toExternalForm(), 70, 105, false, true));
+			oneImage = new ImageView(new Image(getClass().getResource("resources/eScore1.png").toExternalForm(), 70, 105, false, true));
+			twoImage = new ImageView(new Image(getClass().getResource("resources/eScore2.png").toExternalForm(), 70, 105, false, true));
+			threeImage = new ImageView(new Image(getClass().getResource("resources/eScore3.png").toExternalForm(), 70, 105, false, true));
+			fourImage = new ImageView(new Image(getClass().getResource("resources/eScore4.png").toExternalForm(), 70, 105, false, true));
+			fiveImage = new ImageView(new Image(getClass().getResource("resources/eScore5.png").toExternalForm(), 70, 105, false, true));
+			sixImage = new ImageView(new Image(getClass().getResource("resources/eScore6.png").toExternalForm(), 70, 105, false, true));
+			sevenImage = new ImageView(new Image(getClass().getResource("resources/eScore7.png").toExternalForm(), 70, 105, false, true));
+			eightImage = new ImageView(new Image(getClass().getResource("resources/eScore8.png").toExternalForm(), 70, 105, false, true));
+			nineImage = new ImageView(new Image(getClass().getResource("resources/eScore9.png").toExternalForm(), 70, 105, false, true));
 		}
 	}
 	

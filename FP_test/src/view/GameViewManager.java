@@ -29,11 +29,14 @@ public class GameViewManager implements Runnable {
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
 	public static final int maxEmojiGen = 1;
-	public static final int enemyScoreX = 550;
-	public static final int myScoreX = 60;
+	public static final int enemyScoreX = 700;
+	public static final int myScoreX = 130;
 	public static final int scoreY = 20;
-	public static final int scoreDigitOffset = 100;
-	public static final long duration = 1000;	// milliseconds
+	public static final int scoreDigitOffset = 70;
+	public static final int countdownX = 412;
+	public static final int countdownY = 30;
+	public static final int countdownOffset = 90;
+	public static final long duration = 10000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -73,6 +76,9 @@ public class GameViewManager implements Runnable {
 	public AnimationTimer animationTimer;
 	private int myScore;
 	private int enemyScore;
+	private boolean win;
+	private boolean lose;
+	private boolean tie;
 	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 1;
@@ -90,9 +96,9 @@ public class GameViewManager implements Runnable {
 		myScoreHundred = new NumberDisplay(1);
 		myScoreTen = new NumberDisplay(1);
 		myScoreUnit = new NumberDisplay(1);
-		enemyScoreHundred = new NumberDisplay(1);
-		enemyScoreTen = new NumberDisplay(1);
-		enemyScoreUnit = new NumberDisplay(1);
+		enemyScoreHundred = new NumberDisplay(2);
+		enemyScoreTen = new NumberDisplay(2);
+		enemyScoreUnit = new NumberDisplay(2);
 		myScoreHundred.setLayoutXY(myScoreX, scoreY);
 		myScoreTen.setLayoutXY(myScoreX + scoreDigitOffset, scoreY);
 		myScoreUnit.setLayoutXY(myScoreX + 2*scoreDigitOffset, scoreY);
@@ -144,6 +150,17 @@ public class GameViewManager implements Runnable {
 			}
 		}, 0, delay);*/
 		
+		NumberDisplay test1 = new NumberDisplay(0);
+		ImageView imageTest1 = test1.getNumberImage(0);
+		NumberDisplay test2 = new NumberDisplay(0);
+		ImageView imageTest2 = test2.getNumberImage(0);
+		imageTest1.setLayoutX(countdownX);
+		imageTest1.setLayoutY(countdownY);
+		imageTest2.setLayoutX(countdownX + countdownOffset);
+		imageTest2.setLayoutY(countdownY);
+		gamePane.getChildren().add(imageTest1);
+		gamePane.getChildren().add(imageTest2);
+		
 		animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
@@ -155,11 +172,29 @@ public class GameViewManager implements Runnable {
 				isLegal = true;*/
 				countDown();
 				displayScore();
-				for(int i = 0; i < myEmojiList.size(); ++i)
-				{
-					setEmoji(myEmojiList.get(i));
-					emojiOut(myEmojiList.get(i));
+				if(inGame) {
+					for(int i = 0; i < myEmojiList.size(); ++i)
+					{
+						setEmoji(myEmojiList.get(i));
+						emojiOut(myEmojiList.get(i));
+					}
 				}
+				if(win) {
+					ImageView winImage = new ImageView(new Image(getClass().getResource("resources/win.png").toExternalForm(), 100, 150, false, true));
+					gamePane.getChildren().add(winImage);
+					win = false;
+				}
+				if(lose) {
+					ImageView loseImage = new ImageView(new Image(getClass().getResource("resources/lose.png").toExternalForm(), 100, 150, false, true));
+					gamePane.getChildren().add(loseImage);
+					lose = false;
+				}
+				if(tie) {
+					ImageView tieImage = new ImageView(new Image(getClass().getResource("resources/tie.png").toExternalForm(), 100, 150, false, true));
+					gamePane.getChildren().add(tieImage);
+					lose = false;
+				}
+				
 			}
 		};
 		animationTimer.start();
@@ -168,13 +203,14 @@ public class GameViewManager implements Runnable {
 	
 	private void createStartButton() {  
 		GameView_FDButton startButton = new GameView_FDButton("START");
-		startButton.setLayoutX(500);
-		startButton.setLayoutY(100);
+		startButton.setLayoutX(440);
+		startButton.setLayoutY(175);
 		gamePane.getChildren().add(startButton);
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				inGame = true;
+				gamePane.getChildren().remove(startButton);
 			}
 		});
 	}
@@ -217,8 +253,8 @@ public class GameViewManager implements Runnable {
 		//System.out.println(digit);
 		tensDigitImage = timerTens.getNumberImage(digit);
 		if(timerTensState == 0) {
-			tensDigitImage.setLayoutX(750);
-			tensDigitImage.setLayoutY(70);
+			tensDigitImage.setLayoutX(countdownX);
+			tensDigitImage.setLayoutY(countdownY);
 			gamePane.getChildren().add(tensDigitImage);
 			timerTensState = 1;
 		}
@@ -229,8 +265,8 @@ public class GameViewManager implements Runnable {
 		//System.out.println(digit);
 		unitDigitImage = timerUnit.getNumberImage(digit);
 		if(timerUnitState == 0) {
-			unitDigitImage.setLayoutX(840);
-			unitDigitImage.setLayoutY(70);
+			unitDigitImage.setLayoutX(countdownX + countdownOffset);
+			unitDigitImage.setLayoutY(countdownY);
 			gamePane.getChildren().add(unitDigitImage);
 			timerUnitState = 1;
 		}
@@ -268,11 +304,16 @@ public class GameViewManager implements Runnable {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						// stop rendering
-						animationTimer.stop();
 						// end connection
 						net.end();
+						if(myScore > enemyScore)
+							win = true;
+						else if(myScore < enemyScore)
+							lose = true;
+						else tie = true;
 						System.out.println("final score: " + myScore + " " + enemyScore);
+						// stop rendering
+						animationTimer.stop();
 					}
 				}
 			}, 0, delay);
@@ -299,9 +340,14 @@ public class GameViewManager implements Runnable {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
+						if(myScore > enemyScore)
+							win = true;
+						else if(myScore < enemyScore)
+							lose = true;
+						else tie = true;
+						System.out.println("final score: " + myScore + " " + enemyScore);
 						// stop rendering
 						animationTimer.stop();
-						System.out.println("final score: " + myScore + " " + enemyScore);
 					}
 				}
 			}, 0, delay);
