@@ -159,8 +159,12 @@ public class NetModule implements Runnable {
 	private void handleData(String str) {
 		String[] data = str.split("\n");
 		if(data[0].equals("new")) {
-			for(int i = 1; i < data.length; ++i)
-				ui.myEmojiAdd(Emoji.parseString(data[i]));
+			for(int i = 1; i < data.length; ++i) {
+				Emoji e = Emoji.parseString(data[i]);
+				e.setX(e.getX() + GameViewManager.myOffsetX);
+				e.setY(e.getY() + GameViewManager.myOffsetY);
+				ui.myEmojiAdd(e);
+			}
 		}
 		else if(data[0].equals("start")) {
 			ui.inGame = true;

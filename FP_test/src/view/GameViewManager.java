@@ -25,9 +25,9 @@ public class GameViewManager implements Runnable {
 	private static final int GAME_HEIGHT = 768;
 	public static final int shift = 2;
 	public static final int maxX = 500;
-	public static final int maxY = 600;
+	public static final int maxY = 500;
 	public static final int myOffsetX = 500;
-	public static final int myOffsetY = 10;
+	public static final int myOffsetY = 200;
 	public static final int maxEmojiGen = 1;
 	public static final int enemyScoreX = 700;
 	public static final int myScoreX = 130;
@@ -139,37 +139,16 @@ public class GameViewManager implements Runnable {
 			createStartButton();
 		}
 		actioner.start();
-
-		// display emoji
-		/*Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if(inGame) 
-					printEmoji();
-			}
-		}, 0, delay);*/
-		
-		NumberDisplay test1 = new NumberDisplay(0);
-		ImageView imageTest1 = test1.getNumberImage(0);
-		NumberDisplay test2 = new NumberDisplay(0);
-		ImageView imageTest2 = test2.getNumberImage(0);
-		imageTest1.setLayoutX(countdownX);
-		imageTest1.setLayoutY(countdownY);
-		imageTest2.setLayoutX(countdownX + countdownOffset);
-		imageTest2.setLayoutY(countdownY);
-		gamePane.getChildren().add(imageTest1);
-		gamePane.getChildren().add(imageTest2);
 		
 		animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
-				/*if(camera != null) {
+				if(camera != null) {
 					gamePane.getChildren().remove(camera);
 				}
 				isLegal = false;
 				renderImage();
-				isLegal = true;*/
+				isLegal = true;
 				countDown();
 				displayScore();
 				if(inGame) {
@@ -180,17 +159,23 @@ public class GameViewManager implements Runnable {
 					}
 				}
 				if(win) {
-					ImageView winImage = new ImageView(new Image(getClass().getResource("resources/win.png").toExternalForm(), 100, 150, false, true));
+					ImageView winImage = new ImageView(new Image(getClass().getResource("resources/win.png").toExternalForm(), 500, 100, false, true));
+					winImage.setLayoutX(520);
+					winImage.setLayoutY(300);
 					gamePane.getChildren().add(winImage);
 					win = false;
 				}
 				if(lose) {
-					ImageView loseImage = new ImageView(new Image(getClass().getResource("resources/lose.png").toExternalForm(), 100, 150, false, true));
+					ImageView loseImage = new ImageView(new Image(getClass().getResource("resources/lose.png").toExternalForm(), 500, 100, false, true));
+					loseImage.setLayoutX(520);
+					loseImage.setLayoutY(300);
 					gamePane.getChildren().add(loseImage);
 					lose = false;
 				}
 				if(tie) {
-					ImageView tieImage = new ImageView(new Image(getClass().getResource("resources/tie.png").toExternalForm(), 100, 150, false, true));
+					ImageView tieImage = new ImageView(new Image(getClass().getResource("resources/tie.png").toExternalForm(), 400, 100, false, true));
+					tieImage.setLayoutX(600);
+					tieImage.setLayoutY(400);
 					gamePane.getChildren().add(tieImage);
 					lose = false;
 				}
@@ -313,7 +298,7 @@ public class GameViewManager implements Runnable {
 						else tie = true;
 						System.out.println("final score: " + myScore + " " + enemyScore);
 						// stop rendering
-						animationTimer.stop();
+						//animationTimer.stop();
 					}
 				}
 			}, 0, delay);
@@ -347,7 +332,7 @@ public class GameViewManager implements Runnable {
 						else tie = true;
 						System.out.println("final score: " + myScore + " " + enemyScore);
 						// stop rendering
-						animationTimer.stop();
+						//animationTimer.stop();
 					}
 				}
 			}, 0, delay);
@@ -466,7 +451,7 @@ public class GameViewManager implements Runnable {
 		camera.setFitHeight(500);
 		camera.setFitWidth(400);
 		camera.setLayoutX(100);
-		camera.setLayoutY(150);
+		camera.setLayoutY(200);
 		gamePane.getChildren().add(camera);
 	}
 	
