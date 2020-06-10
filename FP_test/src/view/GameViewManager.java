@@ -25,7 +25,7 @@ public class GameViewManager implements Runnable {
 	private static final int GAME_WIDTH = 1024;
 	private static final int GAME_HEIGHT = 768;
 	public static final int shift = 2;
-	public static final int maxX = 500;
+	public static final int maxX = 450;
 	public static final int maxY = 500;
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 200;
