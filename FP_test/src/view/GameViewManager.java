@@ -1,27 +1,16 @@
 package view;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TimerTask;
-
-import javax.imageio.ImageIO;
-
 import java.util.Timer;
-
-import java.util.Date;
-
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-//import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -40,7 +29,11 @@ public class GameViewManager implements Runnable {
 	public static final int myOffsetX = 500;
 	public static final int myOffsetY = 10;
 	public static final int maxEmojiGen = 1;
-	public static final long duration = 30000;	// milliseconds
+	public static final int enemyScoreX = 550;
+	public static final int myScoreX = 60;
+	public static final int scoreY = 20;
+	public static final int scoreDigitOffset = 100;
+	public static final long duration = 1000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -58,8 +51,14 @@ public class GameViewManager implements Runnable {
 	
 	private ImageView tensDigitImage;
 	private ImageView unitDigitImage;
-	private TimerDisplay timerTens = new TimerDisplay();
-	private TimerDisplay timerUnit = new TimerDisplay();
+	private NumberDisplay myScoreHundred;
+	private NumberDisplay myScoreTen;
+	private NumberDisplay myScoreUnit;
+	private NumberDisplay enemyScoreHundred;
+	private NumberDisplay enemyScoreTen;
+	private NumberDisplay enemyScoreUnit;
+	private NumberDisplay timerTens = new NumberDisplay(0);
+	private NumberDisplay timerUnit = new NumberDisplay(0);
 	private int timerTensState = 0;
 	private int timerUnitState = 0;
 	private long lastUnitDigit = 0;
@@ -72,7 +71,7 @@ public class GameViewManager implements Runnable {
 	private boolean isLegal;
 	
 	public AnimationTimer animationTimer;
-	private int score;
+	private int myScore;
 	private int enemyScore;
 	
 	public GameViewManager(String character, String server_IP) {
@@ -83,9 +82,31 @@ public class GameViewManager implements Runnable {
 		emojiList = new ArrayList<Emoji>();
 		net = new NetModule(this);
 		rand = new Random();
-		score = 0;
+		myScore = 0;
 		enemyScore = 0;
 		initializeStage();
+		
+		// score initialization and display
+		myScoreHundred = new NumberDisplay(1);
+		myScoreTen = new NumberDisplay(1);
+		myScoreUnit = new NumberDisplay(1);
+		enemyScoreHundred = new NumberDisplay(1);
+		enemyScoreTen = new NumberDisplay(1);
+		enemyScoreUnit = new NumberDisplay(1);
+		myScoreHundred.setLayoutXY(myScoreX, scoreY);
+		myScoreTen.setLayoutXY(myScoreX + scoreDigitOffset, scoreY);
+		myScoreUnit.setLayoutXY(myScoreX + 2*scoreDigitOffset, scoreY);
+		enemyScoreHundred.setLayoutXY(enemyScoreX, scoreY);
+		enemyScoreTen.setLayoutXY(enemyScoreX + scoreDigitOffset, scoreY);
+		enemyScoreUnit.setLayoutXY(enemyScoreX + 2*scoreDigitOffset, scoreY);
+		gamePane.getChildren().add(myScoreHundred.getNumberImage(0));
+		gamePane.getChildren().add(myScoreTen.getNumberImage(0));
+		gamePane.getChildren().add(myScoreUnit.getNumberImage(0));
+		gamePane.getChildren().add(enemyScoreHundred.getNumberImage(0));
+		gamePane.getChildren().add(enemyScoreTen.getNumberImage(0));
+		gamePane.getChildren().add(enemyScoreUnit.getNumberImage(0));
+		
+		// client server parameters setup
 		if(character.equals("server"))
 			this.isServer = true;
 		else if(character.equals("client")) {
@@ -123,7 +144,6 @@ public class GameViewManager implements Runnable {
 			}
 		}, 0, delay);*/
 		
-		
 		animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
@@ -134,6 +154,7 @@ public class GameViewManager implements Runnable {
 				renderImage();
 				isLegal = true;*/
 				countDown();
+				displayScore();
 				for(int i = 0; i < myEmojiList.size(); ++i)
 				{
 					setEmoji(myEmojiList.get(i));
@@ -165,8 +186,8 @@ public class GameViewManager implements Runnable {
 		if(remainTime>=0) {
 			//System.out.println(remainTime);
 		
-		long unitDigit = remainTime%10;
-		long tensDigit = remainTime/10;
+		int unitDigit = (int)(remainTime%10);
+		int tensDigit = (int)(remainTime/10);
 		if(tensDigit == 6) { //tensDigit has changed
 			timerTensState = 0;
 			timerUnitState = 0;
@@ -191,7 +212,8 @@ public class GameViewManager implements Runnable {
 		//timerTest.getNumber().setLayoutY(70);
 		//gamePane.getChildren().add(timerTest.getNumberZero());
 	}
-	public void setTensDigit(long digit) {
+	
+	public void setTensDigit(int digit) {
 		//System.out.println(digit);
 		tensDigitImage = timerTens.getNumberImage(digit);
 		if(timerTensState == 0) {
@@ -202,7 +224,8 @@ public class GameViewManager implements Runnable {
 		}
 		
 	}
-	public void setUnitDigit(long digit) {
+	
+	public void setUnitDigit(int digit) {
 		//System.out.println(digit);
 		unitDigitImage = timerUnit.getNumberImage(digit);
 		if(timerUnitState == 0) {
@@ -213,6 +236,7 @@ public class GameViewManager implements Runnable {
 		}
 		
 	}
+	
 	public void setResult(int type) {
 		matchedEmoji = type;
 	}
@@ -237,7 +261,7 @@ public class GameViewManager implements Runnable {
 						this.cancel();
 						// send final score
 						net.endGame();
-						String str = "score\n" + Integer.toString(score) + "\n";
+						String str = "score\n" + Integer.toString(myScore) + "\n";
 						net.send(str);
 						try {
 							Thread.sleep(1000);
@@ -248,7 +272,7 @@ public class GameViewManager implements Runnable {
 						animationTimer.stop();
 						// end connection
 						net.end();
-						System.out.println("final score: " + score + " " + enemyScore);
+						System.out.println("final score: " + myScore + " " + enemyScore);
 					}
 				}
 			}, 0, delay);
@@ -268,7 +292,7 @@ public class GameViewManager implements Runnable {
 						// stop timer
 						this.cancel();
 						// send final score
-						String str = "score\n" + Integer.toString(score) + "\n";
+						String str = "score\n" + Integer.toString(myScore) + "\n";
 						net.send(str);
 						try {
 							Thread.sleep(350);
@@ -277,7 +301,7 @@ public class GameViewManager implements Runnable {
 						}
 						// stop rendering
 						animationTimer.stop();
-						System.out.println("final score: " + score + " " + enemyScore);
+						System.out.println("final score: " + myScore + " " + enemyScore);
 					}
 				}
 			}, 0, delay);
@@ -312,7 +336,7 @@ public class GameViewManager implements Runnable {
 				str = str + emojiList.get(i).toString() + "\n";
 			net.send(str);
 			// send score to enemy
-			str = "score\n" + Integer.toString(score) + "\n";
+			str = "score\n" + Integer.toString(myScore) + "\n";
 			net.send(str);
 		}
 		else {
@@ -326,7 +350,7 @@ public class GameViewManager implements Runnable {
 				i++;
 			}
 			// send score to enemy
-			String str = "score\n" + Integer.toString(score) + "\n";
+			String str = "score\n" + Integer.toString(myScore) + "\n";
 			net.send(str);
 		}
 	}
@@ -372,7 +396,7 @@ public class GameViewManager implements Runnable {
 	{
 		if(e.getStatus() == 1 && (e.getY() > maxY + myOffsetY || e.getType() == matchedEmoji))
 		{
-			if(e.getType() == matchedEmoji) score += 10;
+			if(e.getType() == matchedEmoji) myScore += 10;
 			gamePane.getChildren().remove(e.getEmojiImage());
 			e.setStatus(2);
 			return true;
@@ -417,4 +441,27 @@ public class GameViewManager implements Runnable {
 		gamePane.setBackground(new Background(background));
 	}
 	
+	
+	private void displayScore() {
+		// display our score
+		gamePane.getChildren().remove(myScoreHundred.getNumberImage(myScoreHundred.getDigit()));
+		gamePane.getChildren().remove(myScoreTen.getNumberImage(myScoreTen.getDigit()));
+		gamePane.getChildren().remove(myScoreUnit.getNumberImage(myScoreUnit.getDigit()));
+		int unitDigit = myScore%10;
+		int tenDigit = (myScore%100)/10;
+		int hundredDigit = (myScore%1000)/100;
+		gamePane.getChildren().add(myScoreUnit.getNumberImage(unitDigit));
+		gamePane.getChildren().add(myScoreTen.getNumberImage(tenDigit));
+		gamePane.getChildren().add(myScoreHundred.getNumberImage(hundredDigit));
+		// display enemy score
+		gamePane.getChildren().remove(enemyScoreHundred.getNumberImage(enemyScoreHundred.getDigit()));
+		gamePane.getChildren().remove(enemyScoreTen.getNumberImage(enemyScoreTen.getDigit()));
+		gamePane.getChildren().remove(enemyScoreUnit.getNumberImage(enemyScoreUnit.getDigit()));
+		unitDigit = enemyScore%10;
+		tenDigit = (enemyScore%100)/10;
+		hundredDigit = (enemyScore%1000)/100;
+		gamePane.getChildren().add(enemyScoreUnit.getNumberImage(unitDigit));
+		gamePane.getChildren().add(enemyScoreTen.getNumberImage(tenDigit));
+		gamePane.getChildren().add(enemyScoreHundred.getNumberImage(hundredDigit));
+	}
 }
