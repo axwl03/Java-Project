@@ -12,7 +12,6 @@ import javafx.util.Duration;
 
 public class FaceDanceSubScene extends SubScene{
 
-	//private final String FONT_PATH = this.getClass().getResource("resources/kenvector_future.ttf").toExternalForm();
 	private final String BACKGROUND_IMAGE = this.getClass().getResource("resources/yellow_panel.png").toExternalForm(); 
 	
 	private boolean isHidden;

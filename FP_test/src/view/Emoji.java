@@ -8,7 +8,8 @@ public class Emoji {
 	private int x, y;	// emoji's coordinate
 	private int type;	// emoji's type (ex: Face.LAUGH)
 	//private String imagePath;
-	private int status; // 0: new, 1: exist, 2: out
+	private int status; // 0: new, 1: exist, 2: outs
+	
 	private ImageView emojiImage;
 	
 	Emoji(int x, int y, int type) {
@@ -16,13 +17,13 @@ public class Emoji {
 		this.y = y;
 		this.type = type;
 		if(type == Face.ANGRY)
-			emojiImage = new ImageView(new Image(getClass().getResource("resources/angry.png").toExternalForm() , 30, 30, false, true));
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/angry.png").toExternalForm() , 60, 60, false, true));
 		else if(type == Face.HAPPY)
-			emojiImage = new ImageView(new Image(getClass().getResource("resources/happy.png").toExternalForm() , 30, 30, false, true));
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/happy.png").toExternalForm() , 60, 60, false, true));
 		else if(type == Face.SAD)
-			emojiImage = new ImageView(new Image(getClass().getResource("resources/sad.png").toExternalForm() , 30, 30, false, true));
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/sad.png").toExternalForm() , 60, 60, false, true));
 		else if(type == Face.SURPRISE)
-			emojiImage = new ImageView(new Image(getClass().getResource("resources/surprise.png").toExternalForm() , 30, 30, false, true));
+			emojiImage = new ImageView(new Image(getClass().getResource("resources/surprise.png").toExternalForm() , 60, 60, false, true));
 		status = 0;
 	}
 	

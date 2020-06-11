@@ -16,6 +16,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 
@@ -24,16 +25,19 @@ public class GameViewManager implements Runnable {
 	private static final int GAME_WIDTH = 1024;
 	private static final int GAME_HEIGHT = 768;
 	public static final int shift = 2;
-	public static final int maxX = 500;
-	public static final int maxY = 600;
+	public static final int maxX = 450;
+	public static final int maxY = 500;
 	public static final int myOffsetX = 500;
-	public static final int myOffsetY = 10;
+	public static final int myOffsetY = 200;
 	public static final int maxEmojiGen = 1;
-	public static final int enemyScoreX = 550;
-	public static final int myScoreX = 60;
+	public static final int enemyScoreX = 700;
+	public static final int myScoreX = 130;
 	public static final int scoreY = 20;
-	public static final int scoreDigitOffset = 100;
-	public static final long duration = 1000;	// milliseconds
+	public static final int scoreDigitOffset = 70;
+	public static final int countdownX = 412;
+	public static final int countdownY = 30;
+	public static final int countdownOffset = 90;
+	public static final long duration = 30000;	// milliseconds
 	public static final int delay = 1000;	// milliseconds
 	
 	private AnchorPane gamePane;
@@ -73,9 +77,15 @@ public class GameViewManager implements Runnable {
 	public AnimationTimer animationTimer;
 	private int myScore;
 	private int enemyScore;
+	private boolean win;
+	private boolean lose;
+	private boolean tie;
+	private boolean connect;
+	AudioClip gameMusic = new AudioClip(getClass().getResource("resources/gameMusic.mp3").toString());
 	
 	public GameViewManager(String character, String server_IP) {
 		matchedEmoji = 1;
+		connect = false;
 		isLegal = true;
 		inGame = false;
 		myEmojiList = new ArrayList<Emoji>();
@@ -90,9 +100,9 @@ public class GameViewManager implements Runnable {
 		myScoreHundred = new NumberDisplay(1);
 		myScoreTen = new NumberDisplay(1);
 		myScoreUnit = new NumberDisplay(1);
-		enemyScoreHundred = new NumberDisplay(1);
-		enemyScoreTen = new NumberDisplay(1);
-		enemyScoreUnit = new NumberDisplay(1);
+		enemyScoreHundred = new NumberDisplay(2);
+		enemyScoreTen = new NumberDisplay(2);
+		enemyScoreUnit = new NumberDisplay(2);
 		myScoreHundred.setLayoutXY(myScoreX, scoreY);
 		myScoreTen.setLayoutXY(myScoreX + scoreDigitOffset, scoreY);
 		myScoreUnit.setLayoutXY(myScoreX + 2*scoreDigitOffset, scoreY);
@@ -133,33 +143,47 @@ public class GameViewManager implements Runnable {
 			createStartButton();
 		}
 		actioner.start();
-
-		// display emoji
-		/*Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if(inGame) 
-					printEmoji();
-			}
-		}, 0, delay);*/
 		
 		animationTimer = new AnimationTimer() {
 			@Override
 			public void handle(long arg0) {
-				/*if(camera != null) {
+				if(camera != null) {
 					gamePane.getChildren().remove(camera);
 				}
 				isLegal = false;
 				renderImage();
-				isLegal = true;*/
+				isLegal = true;
 				countDown();
 				displayScore();
-				for(int i = 0; i < myEmojiList.size(); ++i)
-				{
-					setEmoji(myEmojiList.get(i));
-					emojiOut(myEmojiList.get(i));
+				if(inGame) {
+					for(int i = 0; i < myEmojiList.size(); ++i)
+					{
+						setEmoji(myEmojiList.get(i));
+						emojiOut(myEmojiList.get(i));
+					}
 				}
+				if(win) {
+					ImageView winImage = new ImageView(new Image(getClass().getResource("resources/win.png").toExternalForm(), 500, 100, false, true));
+					winImage.setLayoutX(520);
+					winImage.setLayoutY(300);
+					gamePane.getChildren().add(winImage);
+					win = false;
+				}
+				if(lose) {
+					ImageView loseImage = new ImageView(new Image(getClass().getResource("resources/lose.png").toExternalForm(), 500, 100, false, true));
+					loseImage.setLayoutX(520);
+					loseImage.setLayoutY(300);
+					gamePane.getChildren().add(loseImage);
+					lose = false;
+				}
+				if(tie) {
+					ImageView tieImage = new ImageView(new Image(getClass().getResource("resources/tie.png").toExternalForm(), 400, 100, false, true));
+					tieImage.setLayoutX(520);
+					tieImage.setLayoutY(300);
+					gamePane.getChildren().add(tieImage);
+					lose = false;
+				}
+				
 			}
 		};
 		animationTimer.start();
@@ -168,13 +192,16 @@ public class GameViewManager implements Runnable {
 	
 	private void createStartButton() {  
 		GameView_FDButton startButton = new GameView_FDButton("START");
-		startButton.setLayoutX(500);
-		startButton.setLayoutY(100);
+		startButton.setLayoutX(440);
+		startButton.setLayoutY(145);
 		gamePane.getChildren().add(startButton);
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				inGame = true;
+				gameMusic.play();
+				if(connect)
+					gamePane.getChildren().remove(startButton);
 			}
 		});
 	}
@@ -217,8 +244,8 @@ public class GameViewManager implements Runnable {
 		//System.out.println(digit);
 		tensDigitImage = timerTens.getNumberImage(digit);
 		if(timerTensState == 0) {
-			tensDigitImage.setLayoutX(750);
-			tensDigitImage.setLayoutY(70);
+			tensDigitImage.setLayoutX(countdownX);
+			tensDigitImage.setLayoutY(countdownY);
 			gamePane.getChildren().add(tensDigitImage);
 			timerTensState = 1;
 		}
@@ -229,8 +256,8 @@ public class GameViewManager implements Runnable {
 		//System.out.println(digit);
 		unitDigitImage = timerUnit.getNumberImage(digit);
 		if(timerUnitState == 0) {
-			unitDigitImage.setLayoutX(840);
-			unitDigitImage.setLayoutY(70);
+			unitDigitImage.setLayoutX(countdownX + countdownOffset);
+			unitDigitImage.setLayoutY(countdownY);
 			gamePane.getChildren().add(unitDigitImage);
 			timerUnitState = 1;
 		}
@@ -244,6 +271,7 @@ public class GameViewManager implements Runnable {
 	public void run() {
 		if(isServer) {
 			net.listen(8080);
+			connect = true;
 			System.out.println("not inGame");
 			while(!inGame) {}
 			System.out.println("inGame");
@@ -259,6 +287,8 @@ public class GameViewManager implements Runnable {
 					else {
 						// stop timer
 						this.cancel();
+						// stop gameMusic
+						gameMusic.stop();
 						// send final score
 						net.endGame();
 						String str = "score\n" + Integer.toString(myScore) + "\n";
@@ -268,11 +298,16 @@ public class GameViewManager implements Runnable {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						// stop rendering
-						animationTimer.stop();
 						// end connection
 						net.end();
+						if(myScore > enemyScore)
+							win = true;
+						else if(myScore < enemyScore)
+							lose = true;
+						else tie = true;
 						System.out.println("final score: " + myScore + " " + enemyScore);
+						// stop rendering
+						//animationTimer.stop();
 					}
 				}
 			}, 0, delay);
@@ -299,9 +334,14 @@ public class GameViewManager implements Runnable {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						// stop rendering
-						animationTimer.stop();
+						if(myScore > enemyScore)
+							win = true;
+						else if(myScore < enemyScore)
+							lose = true;
+						else tie = true;
 						System.out.println("final score: " + myScore + " " + enemyScore);
+						// stop rendering
+						//animationTimer.stop();
 					}
 				}
 			}, 0, delay);
@@ -362,7 +402,7 @@ public class GameViewManager implements Runnable {
 	private void randomEmojiGen() {
 		emojiList.clear();
 		int num = maxEmojiGen; //rand.nextInt(maxEmojiGen+1)
-		if(myEmojiList.size() > 5)
+		if(myEmojiList.size() > 8)
 			return;
 		ArrayList<Emoji> elist = new ArrayList<Emoji>();
 		for(int i = 0; i < num; ++i)
@@ -417,10 +457,10 @@ public class GameViewManager implements Runnable {
 	private void renderImage() {
 		Image image = SwingFXUtils.toFXImage(faceImage, null);
 		camera = new ImageView(image);
-		camera.setFitHeight(500);
-		camera.setFitWidth(400);
-		camera.setLayoutX(100);
-		camera.setLayoutY(150);
+		camera.setFitHeight(500); //500
+		camera.setFitWidth(500); //500
+		camera.setLayoutX(20); //20
+		camera.setLayoutY(200); //200
 		gamePane.getChildren().add(camera);
 	}
 	

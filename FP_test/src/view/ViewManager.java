@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,6 +22,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class ViewManager {
@@ -29,7 +31,8 @@ public class ViewManager {
 	private static final int WIDTH = 1024;
 	private static final int MENU_BUTTONS_START_X = 100;
 	private static final int MENU_BUTTONS_START_Y = 300;
-	AudioClip pick = new AudioClip(getClass().getResource("resources/color-X.mp3").toString()); 
+	private final String FONT_PATH = this.getClass().getResource("resources/kenvector_future.ttf").toExternalForm();
+	AudioClip pick = new AudioClip(getClass().getResource("resources/color-X.mp3").toString());
 
 	private AnchorPane mainPane;
 	private Scene mainScene;
@@ -37,7 +40,7 @@ public class ViewManager {
 	private FaceDanceSubScene connectSubScene;
 	private FaceDanceSubScene creditsSubScene;
 	private FaceDanceSubScene sceneToHide;
-	//private ImageShow imageShow;
+	private ImageShow imageShow;
 	
 	ArrayList<FDButton> menuButtons;
 	ArrayList<ConnectingChoice> choices;
@@ -46,11 +49,11 @@ public class ViewManager {
 	private String IP_address;
 	
 	public ViewManager() {
-		/*try {
+		try {
 			imageShow = new ImageShow();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 		menuButtons = new ArrayList<>();
 		mainPane = new AnchorPane();
 		mainScene = new Scene(mainPane, WIDTH, HEIGHT);
@@ -61,7 +64,7 @@ public class ViewManager {
 		createLogo();
 		createButtons();
 		createSubScenes();
-		//pick.play();
+		pick.play();
 	}
 
 	private void createButtons() {
@@ -81,18 +84,6 @@ public class ViewManager {
 	private void createPlayButton() {
 		FDButton playButton = new FDButton("PLAY");
 		addMenuButton(playButton);
-		/*
-		playButton.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				if(chosenConnectingWay!=null) {
-					GameViewManager gameManager = new GameViewManager(chosenConnectingWay);
-					gameManager.createNewGame(mainStage);
-					pick.stop();
-				}
-			}
-		});*/
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -127,9 +118,30 @@ public class ViewManager {
 	}
 	
 	private void createSubScenes() {
+		createCreditsSubScene();
+		createConnectSubScene();
+	}
+	
+	private void createCreditsSubScene() {
 		creditsSubScene = new FaceDanceSubScene();
 		mainPane.getChildren().add(creditsSubScene);
-		createConnectSubScene();
+		creditsSubScene.getPane().getChildren().add(createAuthors());
+	}
+	
+	private VBox createAuthors() {
+		String[] authors = {"GAME CREATED BY", "Ching Wei Su_F64051083", "Xin Yu Lin_F64056172 ", "Jia Liang Guo_E64056122", "He Shan LIN_F94054011"};
+		VBox box = new VBox();
+		box.setSpacing(20);
+		for(int i=0; i<authors.length; ++i)
+		{
+			Label label = new Label(authors[i]);
+			label.setFont(Font.loadFont(FONT_PATH, 30));
+			box.getChildren().add(label);
+		}
+		box.setAlignment(Pos.CENTER_LEFT);
+		box.setLayoutX(62);
+		box.setLayoutY(50);
+		return box;
 	}
 	
 	private void showSubScene(FaceDanceSubScene subScene) {
@@ -215,7 +227,7 @@ public class ViewManager {
 			public void handle(ActionEvent event) {
 				if(chosenConnectingWay!=null){
 					GameViewManager gameManager = new GameViewManager(chosenConnectingWay, IP_address);
-					//imageShow.getGameViewManager(gameManager);
+					imageShow.getGameViewManager(gameManager);
 					gameManager.createNewGame(mainStage);
 					pick.stop();
 				}
